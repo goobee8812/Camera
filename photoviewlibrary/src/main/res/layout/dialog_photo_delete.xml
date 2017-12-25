@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="375dp"
+                android:layout_height="280dp"
+                android:background="@drawable/bg_dialog_delete_shape">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="360dp"
+        android:layout_height="130dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        app:srcCompat="@drawable/icon_dialog_inquire"/>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageView2"
+        android:layout_marginTop="28dp"
+        android:gravity="center_horizontal"
+        android:text="@string/sure_delete"
+        android:textColor="#9a4800"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/confirm"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginLeft="20dp"
+        android:background="@drawable/btn_dialog_alarm_delete"
+        android:text="@string/button_confirm"
+        android:textColor="@android:color/white"/>
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/btn_dialog_alarm_delete"
+        android:text="@string/button_cancel"
+        android:textColor="@android:color/white"/>
+
+</RelativeLayout>

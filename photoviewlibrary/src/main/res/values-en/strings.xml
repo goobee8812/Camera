@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">PhotoViewLibrary</string>
+    <string name="familyphoto">Family albums</string>
+    <string name="family_cloudphoto">Family cloud photo album</string>
+    <string name="string_image">Gallery</string>
+    <string name="cloud_photo">local video</string>
+    <string name="photo">Album</string>
+    <string name="noInfo_hint">no information</string>
+    <string name="upload_success">Uploaded successfully!</string>
+    <string name="uploading">uploading...</string>
+    <string name="show_no_address">The location is not displayed</string>
+    <string name="delete_now">Deleting...</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="input_right_name">Please enter the correct file name</string>
+    <string name="moving_wait">Please move later, please...</string>
+    <string name="loading">loading...</string>
+
+    <string name="string_canadd">Can be added</string>
+    <string name="string_piece"> picture</string>
+    <string name="string_takephoto">Take pictures</string>
+    <string name="string_selectfromphoto">Select from the phone album</string>
+    <string name="button_publish">Release</string>
+    <string name="unselect_delete_file">The file deletion is not selected</string>
+    <string name="no_delete_file">There are no files to delete</string>
+    <string name="unselect_file">The file is not selected</string>
+    <string name="moveto_photo">Move to album</string>
+    <string name="new_create_photo">Create a new album</string>
+    <string name="photo_named">Name the new album</string>
+    <string name="rename">Rename</string>
+    <string name="shared_to_cloudphoto">Share to cloud albums</string>
+    <string name="shared_to">move to</string>
+    <string name="please_login">please log in first</string>
+
+    <string name="delete_operate">Delete operation</string>
+    <string name="sure_delete">confirm delete?</string>
+    <string name="button_confirm">determine</string>
+    <string name="button_cancel">cancel</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_select_all">select all</string>
+    <string name="button_cancel_select_all">Unselect all</string>
+    <string name="string_date_patten">MMM d, yyyy</string>
+    <string name="string_date_month">MMM</string>
+    <string name="name_exist">The file name already exists</string>
+</resources>

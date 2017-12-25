@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.magic.photo.photoviewlibrary">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/PhotoAppTheme"
+        tools:replace="android:icon,android:theme">
+
+        <activity
+            android:name=".activity.PhotoMainAvtivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/PhotoAppTheme" />
+        <activity
+            android:name=".activity.PhotoShowImagesActivity"
+            android:theme="@style/PhotoAppTheme" />
+
+        <activity
+            android:name=".activity.VideoActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/PhotoAppTheme" />
+        <activity
+            android:name=".activity.VideoListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/PhotoAppTheme" />
+        <activity
+            android:name=".activity.PhotoMainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/PhotoAppTheme" />
+        <activity
+            android:name=".activity.CheckImageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/PhotoAppTheme" />
+
+    </application>
+
+</manifest>

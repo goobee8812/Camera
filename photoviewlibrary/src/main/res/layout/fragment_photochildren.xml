@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/expand_dataList"/>
+
+    <ExpandableListView
+        android:id="@+id/expand_dataList"
+        android:layout_width="@dimen/DP_150PX"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="@dimen/DP_50PX"
+        android:layout_marginTop="@dimen/DP_50PX"/>
+</RelativeLayout>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <SurfaceView
+        android:id="@+id/record_surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#80ffffff"
+        android:padding="10dp">
+
+        <!-- 开始/结束 录制按钮 -->
+        <ImageView
+            android:id="@+id/record_control"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:onClick="startRecord"
+            android:src="@mipmap/recordvideo_start" />
+
+
+
+        <Chronometer
+            android:id="@+id/record_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:format="%s"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/ivCamera"
+        android:layout_width="106dp"
+        android:layout_height="106dp"
+         android:src="@mipmap/camera_icon"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_centerVertical="true"
+        />
+
+    <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="22dp"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:src="@mipmap/back_hui" />
+
+</RelativeLayout>

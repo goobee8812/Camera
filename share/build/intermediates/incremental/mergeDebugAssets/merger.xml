@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="E:\work\Camera\share\src\main\assets"><file name="ShareSDK.xml" path="E:\work\Camera\share\src\main\assets\ShareSDK.xml"/></source><source path="E:\work\Camera\share\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="E:\work\Camera\share\src\debug\assets"/></dataSet></merger>

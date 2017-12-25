@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView"
+        style="@style/text_style"
+        android:layout_marginTop="@dimen/DP_20PX"
+        android:text="@string/rename"/>
+
+    <EditText
+        android:id="@+id/ed_rename"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/DP_40PX"
+        android:layout_margin="@dimen/DP_20PX"
+        android:background="@color/background_color"
+        android:paddingLeft="@dimen/DP_5PX"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/SP_17PX"/>
+</LinearLayout>

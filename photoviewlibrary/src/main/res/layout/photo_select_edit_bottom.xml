@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="60dp"
+              android:background="@android:color/white"
+              android:gravity="center">
+
+    <LinearLayout
+        android:id="@+id/layout_remove"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/DP_20PX"
+        android:paddingRight="@dimen/DP_20PX">
+
+        <ImageView
+            android:id="@+id/iv_remove"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/move2"/>
+
+        <TextView
+            android:id="@+id/tv_remove"
+            style="@style/text_select_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/DP_6PX"
+            android:text="@string/shared_to"
+            android:textColor="@color/light_gray"
+            android:textSize="@dimen/text_middle_size"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_shared"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/DP_80PX"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/DP_20PX"
+        android:paddingRight="@dimen/DP_20PX">
+
+        <ImageView
+            android:id="@+id/iv_shared"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/share2"/>
+
+        <TextView
+            android:id="@+id/tv_shared"
+            style="@style/text_select_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/DP_6PX"
+            android:text="@string/shared_to_cloudphoto"
+            android:textColor="@color/light_gray"
+            android:textSize="@dimen/text_middle_size"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_delete2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/DP_80PX"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/DP_20PX"
+        android:paddingRight="@dimen/DP_20PX">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/del1"/>
+
+        <TextView
+            style="@style/text_select_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/DP_6PX"
+            android:text="@string/button_delete"
+            android:textColor="@color/orange"
+            android:textSize="@dimen/text_middle_size"/>
+    </LinearLayout>
+</LinearLayout>
