@@ -24,7 +24,7 @@ android {
         variant.outputs.all {
             // abc_渠道名_版本名.apk  还可以拼接其他app内容：variant.versionCode  variant.buildType.name
 
-            outputFileName = "camera_V${variant.versionName}_${variant.flavorName}_${releaseTime()}.apk"
+            outputFileName = "camera_v${variant.versionName}_${variant.flavorName}_${releaseTime()}.apk"
         }
     }
 }

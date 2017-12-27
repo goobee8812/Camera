@@ -112,12 +112,13 @@ public class ZXPhotographActivity extends AppCompatActivity {
         ActivityContainer.getInstance().addActivity(this);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED&&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA,
+                            Manifest.permission.RECORD_AUDIO,
                             Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_READ_CONTACTS);

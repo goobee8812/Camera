@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Camera;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
@@ -32,6 +31,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 public class CustomRecordActivity extends AppCompatActivity implements View.OnClickListener {
@@ -61,6 +61,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
     private PhotographBroadCast photographBroadCast;
     private IntentFilter filter;
+    private int width = 640;
+    private int height = 480;
 
 
     private Handler mHandler = new MyHandler(this);
@@ -138,6 +140,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         ivBack = (ImageView) findViewById(R.id.ivBack);
         ivCamera = (ImageView) findViewById(R.id.ivCamera);
         mRecordTime = (Chronometer) findViewById(R.id.record_time);
+        mRecordTime.setVisibility(View.GONE);
         ivBack.setOnClickListener(this);
         ivCamera.setOnClickListener(this);
         mRecordControl.setOnClickListener(this);
@@ -197,9 +200,9 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             return;
         }
         try {
-            mCamera.setPreviewDisplay(mSurfaceHolder);
             //配置CameraParams
             setCameraParams();
+            mCamera.setPreviewDisplay(mSurfaceHolder);
             //启动相机预览
             mCamera.startPreview();
         } catch (IOException e) {
@@ -211,6 +214,20 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private void setCameraParams() {
         if (mCamera != null) {
             Camera.Parameters params = mCamera.getParameters();
+            for (Camera.Size size : params.getSupportedPreviewSizes()) {
+                if (size.width == width && size.height == height) {
+                    params.setPreviewSize(width, height);
+                    break;
+                }
+            }
+            List<int[]> fpsRanges = params.getSupportedPreviewFpsRange();
+            if (fpsRanges.size() > 0) {
+                int[] range = fpsRanges.get(0);
+                if (range != null) {
+                    params.setPreviewFpsRange(range[Camera.Parameters.PREVIEW_FPS_MIN_INDEX], range[Camera.Parameters.PREVIEW_FPS_MAX_INDEX]);
+                }
+            }
+
             mCamera.setParameters(params);
         }
     }
@@ -239,6 +256,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             e.printStackTrace();
         }
         isRecording = true;
+        mRecordTime.setVisibility(View.VISIBLE);
+        ivCamera.setVisibility(View.GONE);
         if (mPauseTime != 0) {
             mRecordTime.setBase(SystemClock.elapsedRealtime() - (mPauseTime - mRecordTime.getBase()));
         } else {
@@ -265,6 +284,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             mediaRecorder = null;
 
             mRecordTime.stop();
+            mRecordTime.setVisibility(View.GONE);
+            ivCamera.setVisibility(View.VISIBLE);
             isRecording = false;
 
         }
@@ -391,7 +412,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             Toast.makeText(context, "SD卡不存在", Toast.LENGTH_SHORT).show();
 
         }
-        File eis = new File(sdDir.toString() + "/Video/");
+        File eis = new File(sdDir.toString() + "/Camera/");
         try {
             if (!eis.exists()) {
                 eis.mkdir();
@@ -399,7 +420,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         } catch (Exception e) {
 
         }
-        return sdDir.toString() + "/Video/";
+        return sdDir.toString() + "/Camera/";
     }
 
 
@@ -407,48 +428,75 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
      * 配置MediaRecorder()
      */
     private void setConfigRecord() {
-        mediaRecorder = new MediaRecorder();
-        mediaRecorder.reset();
+        mediaRecorder = new MediaRecorder();// 创建mediarecorder对象
+        // 设置录制视频源为Camera(相机)
         mediaRecorder.setCamera(mCamera);
-        mediaRecorder.setOnErrorListener(OnErrorListener);
-
-        //使用SurfaceView预览
-        mediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
-
-        //1.设置采集声音
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        //设置采集图像
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        //2.设置视频，音频的输出格式 mp4
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-        //3.设置音频的编码格式
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+
+        //mediarecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
+        // 设置录制完成后视频的封装格式THREE_GPP为3gp.MPEG_4为mp4
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        // 设置录制的视频编码h263 h264
+        //mediarecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        //设置图像的编码格式
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        //设置立体声
-        //        mediaRecorder.setAudioChannels(2);
-        //设置最大录像时间 单位：毫秒
-        //        mediaRecorder.setMaxDuration(60 * 1000);
-        //设置最大录制的大小 单位，字节
-        //        mediaRecorder.setMaxFileSize(1024 * 1024);
-        //音频一秒钟包含多少数据位
-        CamcorderProfile mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
-        mediaRecorder.setAudioEncodingBitRate(44100);
-        if (mProfile.videoBitRate > 2 * 1024 * 1024) {
-            mediaRecorder.setVideoEncodingBitRate(2 * 1024 * 1024);
-        } else {
-            mediaRecorder.setVideoEncodingBitRate(1024 * 1024);
-        }
-        mediaRecorder.setVideoFrameRate(mProfile.videoFrameRate);
-
-        //设置选择角度，顺时针方向，因为默认是逆向90度的，这样图像就是正常显示了,这里设置的是观看保存后的视频的角度
-        mediaRecorder.setOrientationHint(0);
-        //设置录像的分辨率
-        mediaRecorder.setVideoSize(352, 288);
-
-        //设置录像视频保存地址
+        //mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
+        // 设置视频录制的分辨率。必须放在设置编码和格式的后面，否则报错
+        mediaRecorder.setVideoSize(width, height);
+        //mediarecorder.setVideoEncodingBitRate(bitRat);
+        // 设置录制的视频帧率。必须放在设置编码和格式的后面，否则报错
+//					if (fps != 0) {
+//						mediarecorder.setVideoFrameRate(fps);
+//					}
+        //mediarecorder.setOrientationHint(90);
+        mediaRecorder.setPreviewDisplay(surfaceView.getHolder().getSurface());
+        //        //设置录像视频保存地址
         currentVideoFilePath = getSDPath(getApplicationContext()) + getVideoName();
         mediaRecorder.setOutputFile(currentVideoFilePath);
+
+
+//        mediaRecorder = new MediaRecorder();
+//        mediaRecorder.reset();
+//        mediaRecorder.setCamera(mCamera);
+//        mediaRecorder.setOnErrorListener(OnErrorListener);
+//
+//        //使用SurfaceView预览
+//        mediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
+//
+//        //1.设置采集声音
+//        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//        //设置采集图像
+//        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+//        //2.设置视频，音频的输出格式 mp4
+//        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+//        //3.设置音频的编码格式
+//        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+//        //设置图像的编码格式
+//        mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+//        //设置立体声
+//        //        mediaRecorder.setAudioChannels(2);
+//        //设置最大录像时间 单位：毫秒
+//        //        mediaRecorder.setMaxDuration(60 * 1000);
+//        //设置最大录制的大小 单位，字节
+//        //        mediaRecorder.setMaxFileSize(1024 * 1024);
+//        //音频一秒钟包含多少数据位
+//        CamcorderProfile mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
+//        mediaRecorder.setAudioEncodingBitRate(44100);
+//        if (mProfile.videoBitRate > 2 * 1024 * 1024) {
+//            mediaRecorder.setVideoEncodingBitRate(2 * 1024 * 1024);
+//        } else {
+//            mediaRecorder.setVideoEncodingBitRate(1024 * 1024);
+//        }
+//        mediaRecorder.setVideoFrameRate(mProfile.videoFrameRate);
+//
+//        //设置选择角度，顺时针方向，因为默认是逆向90度的，这样图像就是正常显示了,这里设置的是观看保存后的视频的角度
+//        mediaRecorder.setOrientationHint(0);
+//        //设置录像的分辨率
+//        mediaRecorder.setVideoSize(640, 480);
+//        //设置录像视频保存地址
+//        currentVideoFilePath = getSDPath(getApplicationContext()) + getVideoName();
+//        mediaRecorder.setOutputFile(currentVideoFilePath);
     }
 
     private String getVideoName() {

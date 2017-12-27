@@ -26,9 +26,9 @@ import java.util.TimerTask;
 
 
 public class PhotographPresentImpl implements PhotographPresent {
-    public static final String TAG               = "PhotographPresentImpl";
-    public static       boolean takePhotoLock     = false;
-    public static       boolean isPhotoStopThread = false;
+    public static final String TAG = "PhotographPresentImpl";
+    public static boolean takePhotoLock = false;
+    public static boolean isPhotoStopThread = false;
 
     @Override
     public void takePhoto(Camera camera, final PhotographActivity activity) {
@@ -38,15 +38,17 @@ public class PhotographPresentImpl implements PhotographPresent {
         Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
-                final File pictureDir = Environment.getExternalStorageDirectory();
+                final String pictureDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Camera";
                 if (pictureDir == null) {
                     Log.d(TAG, "Error creating media file, check storage permissions!");
                     return;
                 }
-                final String pictureName = pictureDir
-                        + File.separator + DateFormat.format("yyyyMMddHHmmss",
-                        new Date()).toString()
-                        + ".png";
+                File f = new File(pictureDir);
+                if (!f.exists()) {
+                    f.mkdir();
+                }
+                final String pictureName = pictureDir + File.separator + DateFormat.format("yyyyMMddHHmmss", new Date()).toString() + ".png";
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -57,7 +59,7 @@ public class PhotographPresentImpl implements PhotographPresent {
                             // 把文件插入到系统图库
                             try {
                                 MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                        pictureDir.getAbsolutePath(), pictureName, null);
+                                        pictureDir, pictureName, null);
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
                             }
@@ -91,28 +93,32 @@ public class PhotographPresentImpl implements PhotographPresent {
         Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
-                final File pictureDir = Environment.getExternalStorageDirectory();
+                final String pictureDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Camera";
                 if (pictureDir == null) {
                     Log.d(TAG, "Error creating media file, check storage permissions!");
                     return;
                 }
-                final String pictureName = pictureDir
-                        + File.separator + DateFormat.format("yyyyMMddHHmmss", new Date()).toString() + ".png";
+                File f = new File(pictureDir);
+                if (!f.exists()) {
+                    f.mkdir();
+                }
+                final String pictureName = pictureDir + File.separator + DateFormat.format("yyyyMMddHHmmss", new Date()).toString() + ".png";
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
+
                             FileOutputStream fos = new FileOutputStream(pictureName);
                             fos.write(data);
                             fos.close();
-                            // 把文件插入到系统图库
+//                            // 把文件插入到系统图库
                             try {
-                                MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                        pictureDir.getAbsolutePath(), pictureName, null);
+                                MediaStore.Images.Media.insertImage(activity.getContentResolver(), pictureName, pictureName, null);
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
                             }
-                            // 通知图库更新
+//                            // 通知图库更新
                             activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
                             activity.runOnUiThread(new Runnable() {
                                 @Override
@@ -122,8 +128,10 @@ public class PhotographPresentImpl implements PhotographPresent {
                                 }
                             });
                         } catch (FileNotFoundException e) {
+                            e.printStackTrace();
                             Log.d(TAG, "File not found: " + e.getMessage());
                         } catch (IOException e) {
+                            e.printStackTrace();
                             Log.d(TAG, "Error accessing file: " + e.getMessage());
                         }
                     }

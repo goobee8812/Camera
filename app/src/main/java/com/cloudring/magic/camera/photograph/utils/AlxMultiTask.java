@@ -34,16 +34,18 @@ public abstract class AlxMultiTask<Params, Progress, Result> extends AsyncTask<P
             return thread;
         }
     };
-    public void executeDependSDK(Params...params){
-        if(mTHREAD_POOL_EXECUTOR==null)initThreadPool();
-        super.executeOnExecutor(mTHREAD_POOL_EXECUTOR,params);
+
+
+    public void executeDependSDK(Params... params) {
+        if (mTHREAD_POOL_EXECUTOR == null) initThreadPool();
+        super.executeOnExecutor(mTHREAD_POOL_EXECUTOR, params);
     }
 
 
     /**
      * 初始化线程池
      */
-    public static void initThreadPool(){
+    public void initThreadPool() {
         mTHREAD_POOL_EXECUTOR = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory);
     }
 

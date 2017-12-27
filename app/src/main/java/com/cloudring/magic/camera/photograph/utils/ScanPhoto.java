@@ -28,63 +28,78 @@ public class ScanPhoto {
      * 并且为entity存入图片的时间戳和url属性
      */
     public static void getPhotoFromLocalStorage(final Context context, final ScanPhoto.LookUpPhotosCallback completeCallback, final int size) {
-        new AlxMultiTask<Void, Void, ArrayList<PhotoEntity>>() {
-            @Override
-            protected ArrayList<PhotoEntity> doInBackground(Void... params) {
-                allPhotoArrayList = new ArrayList<>();
-                String getImage = " limit ";
-                String defaultSize = " limit 10";
-                String getSize = getImage + size;
-                if (size == 0) {
-                    getSize = defaultSize;
-                } else {
-                    getSize = getImage + size;
-                }
-                Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                ContentResolver mContentResolver = context.getContentResolver();//得到内容处理者实例
-                String sortOrder = MediaStore.Images.Media.DATE_ADDED + " desc";//设置拍摄日期为倒序
-//                Log.i("Alex", "准备查找图片");
-                // 只查询jpeg和png的图片
-                Cursor mCursor = mContentResolver.query(mImageUri, new String[]{MediaStore.Images.Media.DATA},
-                        MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?", new String[]{"image/jpeg", "image/png"}, sortOrder + getSize);
-                if (mCursor == null) return allPhotoArrayList;
-                int size = mCursor.getCount();
-//                Log.i("Alex", "查到的size是" + size);
-                if (size == 0) {
-                    return allPhotoArrayList;
-                }
-                for (int i = 0; i < size; i++) {//遍历全部图片
-                    mCursor.moveToPosition(i);
-                    String path = mCursor.getString(0);// 获取图片的路径
-                    String dataTime = pictureSortTime(path);//将所有图片的时间数据放到整型数组里
-                    PhotoEntity entity = new PhotoEntity();
-                    entity.url = path;//将图片的uri放到对象里去
-                    entity.time = dataTime;
-                    Date timeDate = TimeUtil.dataOne(dataTime);
-                    entity.timeDate = timeDate;
-                    Calendar calendar = Calendar.getInstance();
-                    if (timeDate!=null){
-                        calendar.setTime(timeDate);
-                        entity.calendar = calendar;
-                    }
-                    allPhotoArrayList.add(entity);
-                }
 
-                mCursor.close();
+        new MyAlxMultiTask(context, completeCallback, size).executeDependSDK();
+    }
+
+    private static class MyAlxMultiTask extends AlxMultiTask<Void, Void, ArrayList<PhotoEntity>> {
+
+        private Context context;
+        private ScanPhoto.LookUpPhotosCallback completeCallback;
+        private int size;
+
+        public MyAlxMultiTask(Context context, ScanPhoto.LookUpPhotosCallback completeCallback, int size) {
+            this.context = context;
+            this.completeCallback = completeCallback;
+            this.size = size;
+        }
+
+        @Override
+        protected ArrayList<PhotoEntity> doInBackground(Void... voids) {
+            allPhotoArrayList = new ArrayList<>();
+            String getImage = " limit ";
+            String defaultSize = " limit 10";
+            String getSize = getImage + size;
+            if (size == 0) {
+                getSize = defaultSize;
+            } else {
+                getSize = getImage + size;
+            }
+            Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            ContentResolver mContentResolver = context.getContentResolver();//得到内容处理者实例
+            String sortOrder = MediaStore.Images.Media.DATE_ADDED + " desc";//设置拍摄日期为倒序
+//                Log.i("Alex", "准备查找图片");
+            // 只查询jpeg和png的图片
+            Cursor mCursor = mContentResolver.query(mImageUri, new String[]{MediaStore.Images.Media.DATA},
+                    MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?", new String[]{"image/jpeg", "image/png"}, sortOrder + getSize);
+            if (mCursor == null) return allPhotoArrayList;
+            int size = mCursor.getCount();
+//                Log.i("Alex", "查到的size是" + size);
+            if (size == 0) {
                 return allPhotoArrayList;
             }
-
-            @Override
-            protected void onPostExecute(ArrayList<PhotoEntity> photoArrayList) {
-                super.onPostExecute(photoArrayList);
-                if (photoArrayList == null) {
-                    return;
+            for (int i = 0; i < size; i++) {//遍历全部图片
+                mCursor.moveToPosition(i);
+                String path = mCursor.getString(0);// 获取图片的路径
+                String dataTime = pictureSortTime(path);//将所有图片的时间数据放到整型数组里
+                PhotoEntity entity = new PhotoEntity();
+                entity.url = path;//将图片的uri放到对象里去
+                entity.time = dataTime;
+                Date timeDate = TimeUtil.dataOne(dataTime);
+                entity.timeDate = timeDate;
+                Calendar calendar = Calendar.getInstance();
+                if (timeDate != null) {
+                    calendar.setTime(timeDate);
+                    entity.calendar = calendar;
                 }
-                if (completeCallback != null) {
-                    completeCallback.onSuccess(photoArrayList);
-                }
+                allPhotoArrayList.add(entity);
             }
-        }.executeDependSDK();
+
+            mCursor.close();
+            return allPhotoArrayList;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<PhotoEntity> photoArrayList) {
+            super.onPostExecute(photoArrayList);
+            if (photoArrayList == null) {
+                return;
+            }
+            if (completeCallback != null) {
+                completeCallback.onSuccess(photoArrayList);
+            }
+
+        }
     }
 
     /**
