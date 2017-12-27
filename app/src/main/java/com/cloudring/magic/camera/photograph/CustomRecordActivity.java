@@ -61,8 +61,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
     private PhotographBroadCast photographBroadCast;
     private IntentFilter filter;
-    private int width = 640;
-    private int height = 480;
+    private int width = 1280;
+    private int height = 720;
 
 
     private Handler mHandler = new MyHandler(this);

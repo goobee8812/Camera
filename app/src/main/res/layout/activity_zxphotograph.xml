@@ -58,9 +58,9 @@
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginStart="22dp"
             android:layout_marginTop="22dp"
             android:background="?selectableItemBackground"
             android:clickable="true"
