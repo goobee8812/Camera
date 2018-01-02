@@ -132,6 +132,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
         registerReceiver();
 
+        initCamera();
+
     }
 
     private void initView() {
@@ -367,7 +369,11 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         super.onPause();
 
         unregisterReceiver(photographBroadCast);
-        releaseCamera();
+
+        mRecordControl.setImageResource(R.mipmap.recordvideo_start);
+        stopRecord();
+        stopCamera();
+        mPauseTime = 0;
     }
 
     // 释放相机

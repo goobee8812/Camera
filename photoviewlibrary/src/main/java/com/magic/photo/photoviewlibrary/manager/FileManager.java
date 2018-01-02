@@ -197,7 +197,7 @@ public class FileManager {
                 }
                 long id = cursor.getLong(cursor.getColumnIndex(IMAGE_COLUMN[0]));
                 String size = cursor.getString(cursor.getColumnIndex(IMAGE_COLUMN[2]));
-                if (Integer.parseInt(size) < 10240) {
+                if (TextUtils.isEmpty(size) || Integer.parseInt(size) < 10240) {
                     System.out.println(size);
                     continue;
                 }
