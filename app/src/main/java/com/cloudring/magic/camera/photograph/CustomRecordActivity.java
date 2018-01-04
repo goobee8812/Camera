@@ -370,10 +370,11 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
         unregisterReceiver(photographBroadCast);
 
-        mRecordControl.setImageResource(R.mipmap.recordvideo_start);
-        stopRecord();
-        stopCamera();
-        mPauseTime = 0;
+        if (isRecording) {
+            mCurrentTime = 0;
+            mRecordControl.setEnabled(true);
+            mRecordControl.performClick();
+        }
     }
 
     // 释放相机

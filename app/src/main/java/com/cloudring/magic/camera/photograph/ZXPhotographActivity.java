@@ -47,7 +47,7 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class ZXPhotographActivity extends AppCompatActivity {
+public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto.LookUpPhotosCallback {
     public static final int TAKE_PHOTO = 1;
     public static final int CHOOSE_PHOTO = 2;
     public static final int RECORDING = 3;
@@ -112,7 +112,7 @@ public class ZXPhotographActivity extends AppCompatActivity {
         ActivityContainer.getInstance().addActivity(this);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED&&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
         } else {
@@ -229,8 +229,9 @@ public class ZXPhotographActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(this);
         initCamera();
-        refreshPhotoOne(ivPhotoAlbum);
+        refreshPhotoOne();
         PhotographPresentImpl.isPhotoStopThread = false;
 
         initReceiver();
@@ -250,6 +251,8 @@ public class ZXPhotographActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(null);
         releaseCamera();
         PhotographPresentImpl.isPhotoStopThread = true;
         handler.removeCallbacksAndMessages(null);
@@ -276,27 +279,14 @@ public class ZXPhotographActivity extends AppCompatActivity {
         unbindService(MyServiceConnection.getInstance().conn);
     }
 
-    public void refreshPhotoOne(final ImageView view) {
+    public void refreshPhotoOne() {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ScanPhoto.getPhotoFromLocalStorage(ZXPhotographActivity.this, new ScanPhoto.LookUpPhotosCallback() {
-                    //获取本地相册第一张图片
-                    @Override
-                    public void onSuccess(ArrayList<PhotoEntity> photoArrayList) {
-                        if (photoArrayList.size() == 0) {
-                            view.setVisibility(View.GONE);
-                            return;
-                        }
-                        view.setVisibility(View.VISIBLE);
-                        Glide.with(ZXPhotographActivity.this).load(new File(photoArrayList.get(0).url)).into(view);
-                    }
-                }, 1);
+                ScanPhoto.getInstance(ZXPhotographActivity.this).getPhotoFromLocalStorage();
             }
-        }, 1500);
-
+        }, 500);
     }
-
 
     // 判断相机是否支持
     private boolean checkCameraHardware(Context context) {
@@ -392,6 +382,16 @@ public class ZXPhotographActivity extends AppCompatActivity {
         filter.addAction("com.android.Camera.stopVideo");
         photographBroadCast = new PhotographBroadCast();
         registerReceiver(photographBroadCast, filter);
+    }
+
+    @Override
+    public void onSuccess(ArrayList<PhotoEntity> photoArrayList) {
+        if (photoArrayList.size() == 0) {
+            ivPhotoAlbum.setVisibility(View.GONE);
+            return;
+        }
+        ivPhotoAlbum.setVisibility(View.VISIBLE);
+        Glide.with(ZXPhotographActivity.this).load(new File(photoArrayList.get(0).url)).into(ivPhotoAlbum);
     }
 
 

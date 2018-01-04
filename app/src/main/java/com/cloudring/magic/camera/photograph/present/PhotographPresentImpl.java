@@ -87,12 +87,14 @@ public class PhotographPresentImpl implements PhotographPresent {
 
     @Override
     public void takePhoto(Camera camera, final ZXPhotographActivity activity) {
+
         /**
          * 拍照实例
          */
         Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
+                System.out.println(System.currentTimeMillis());
                 final String pictureDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Camera";
                 if (pictureDir == null) {
                     Log.d(TAG, "Error creating media file, check storage permissions!");
@@ -109,22 +111,25 @@ public class PhotographPresentImpl implements PhotographPresent {
                     public void run() {
                         try {
 
+                            System.out.println(System.currentTimeMillis());
                             FileOutputStream fos = new FileOutputStream(pictureName);
                             fos.write(data);
                             fos.close();
+                            System.out.println(System.currentTimeMillis());
 //                            // 把文件插入到系统图库
-                            try {
-                                MediaStore.Images.Media.insertImage(activity.getContentResolver(), pictureName, pictureName, null);
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
+//                            try {
+//                                MediaStore.Images.Media.insertImage(activity.getContentResolver(), pictureName, pictureName, null);
+//                            } catch (FileNotFoundException e) {
+//                                e.printStackTrace();
+//                            }
+                            System.out.println(System.currentTimeMillis());
 //                            // 通知图库更新
                             activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    activity.refreshPhotoOne(activity.ivPhotoAlbum);
-                                    activity.setResult(1001);
+                                    System.out.println(System.currentTimeMillis());
+                                    activity.refreshPhotoOne();
                                 }
                             });
                         } catch (FileNotFoundException e) {

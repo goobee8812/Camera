@@ -23,25 +23,39 @@ public class ScanPhoto {
     static final String TAG = "ScanPhoto";
     private static ArrayList<PhotoEntity> allPhotoArrayList;
 
+    private static ScanPhoto instance;
+    private Context context;
+    private ScanPhoto.LookUpPhotosCallback completeCallback;
+
+    private ScanPhoto(Context context) {
+        this.context = context;
+    }
+
+    public static ScanPhoto getInstance(Context context) {
+        if (instance == null) {
+            synchronized (ScanPhoto.class) {
+                if (instance == null) {
+                    instance = new ScanPhoto(context);
+                }
+            }
+        }
+        return instance;
+    }
+
+
     /**
      * 从系统相册里面取出图片的uri
      * 并且为entity存入图片的时间戳和url属性
      */
-    public static void getPhotoFromLocalStorage(final Context context, final ScanPhoto.LookUpPhotosCallback completeCallback, final int size) {
+    public void getPhotoFromLocalStorage() {
 
-        new MyAlxMultiTask(context, completeCallback, size).executeDependSDK();
+        new MyAlxMultiTask().executeDependSDK();
     }
 
-    private static class MyAlxMultiTask extends AlxMultiTask<Void, Void, ArrayList<PhotoEntity>> {
+    private class MyAlxMultiTask extends AlxMultiTask<Void, Void, ArrayList<PhotoEntity>> {
 
-        private Context context;
-        private ScanPhoto.LookUpPhotosCallback completeCallback;
-        private int size;
+        public MyAlxMultiTask() {
 
-        public MyAlxMultiTask(Context context, ScanPhoto.LookUpPhotosCallback completeCallback, int size) {
-            this.context = context;
-            this.completeCallback = completeCallback;
-            this.size = size;
         }
 
         @Override
@@ -49,12 +63,8 @@ public class ScanPhoto {
             allPhotoArrayList = new ArrayList<>();
             String getImage = " limit ";
             String defaultSize = " limit 10";
-            String getSize = getImage + size;
-            if (size == 0) {
-                getSize = defaultSize;
-            } else {
-                getSize = getImage + size;
-            }
+            String getSize = defaultSize;
+
             Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             ContentResolver mContentResolver = context.getContentResolver();//得到内容处理者实例
             String sortOrder = MediaStore.Images.Media.DATE_ADDED + " desc";//设置拍摄日期为倒序
@@ -83,8 +93,8 @@ public class ScanPhoto {
                     entity.calendar = calendar;
                 }
                 allPhotoArrayList.add(entity);
+                break;
             }
-
             mCursor.close();
             return allPhotoArrayList;
         }
@@ -100,6 +110,10 @@ public class ScanPhoto {
             }
 
         }
+    }
+
+    public void setOnLookUpPhotosCallback(LookUpPhotosCallback completeCallback) {
+        this.completeCallback = completeCallback;
     }
 
     /**
