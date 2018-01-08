@@ -1,4 +1,4 @@
-package com.cloudring.magic.camera.photograph.utils;
+package com.cloudring.magic.camera.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
-
 
 import java.io.IOException;
 import java.util.ArrayList;

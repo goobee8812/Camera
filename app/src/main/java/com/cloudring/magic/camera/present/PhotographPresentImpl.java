@@ -1,4 +1,4 @@
-package com.cloudring.magic.camera.photograph.present;
+package com.cloudring.magic.camera.present;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,10 +11,10 @@ import android.support.v4.content.FileProvider;
 import android.text.format.DateFormat;
 import android.util.Log;
 
-import com.cloudring.magic.camera.photograph.CustomRecordActivity;
-import com.cloudring.magic.camera.photograph.PhotographActivity;
-import com.cloudring.magic.camera.photograph.ZXPhotographActivity;
-import com.cloudring.magic.camera.photograph.utils.ToastUtilKe;
+import com.cloudring.magic.camera.CustomRecordActivity;
+import com.cloudring.magic.camera.PhotographActivity;
+import com.cloudring.magic.camera.ZXPhotographActivity;
+import com.cloudring.magic.camera.utils.ToastUtilKe;
 
 import java.io.File;
 import java.io.FileNotFoundException;

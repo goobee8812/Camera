@@ -1,4 +1,4 @@
-package com.cloudring.magic.camera.photograph;
+package com.cloudring.magic.camera;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,8 +23,7 @@ import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.cloudring.magic.camera.R;
-import com.cloudring.magic.camera.photograph.utils.VideoUtils;
+import com.cloudring.magic.camera.utils.VideoUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +70,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     //    private static IaudioState iaudioState;
     private long mCurrentTime;
 
-    public static void setCallBack(IaudioState callBack) {
+    public static void setCallBack(com.cloudring.magic.camera.photograph.IaudioState callBack) {
 //        iaudioState = callBack;
     }
 
@@ -330,7 +329,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                                             f.delete();
                                             new File(currentVideoFilePath).delete();
                                             MediaScannerConnection.scanFile(CustomRecordActivity.this, new String[]{currentVideoFilePath}, null, null);
-
                                         }
                                     }
                                     initCamera();
@@ -340,7 +338,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                             }
                         }).start();
                     }
-                    MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
+//                    MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
                     sendBroadcast(new Intent("com.android.Camera2.stopVideoRecording"));
 
                     mCurrentTime = System.currentTimeMillis();

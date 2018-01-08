@@ -1,4 +1,4 @@
-package com.cloudring.magic.camera.photograph.utils;
+package com.cloudring.magic.camera.utils;
 
 /**
  * Created by Alex on 2016/8/22.

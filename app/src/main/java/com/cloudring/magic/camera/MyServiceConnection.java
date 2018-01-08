@@ -1,4 +1,4 @@
-package com.cloudring.magic.camera.photograph;
+package com.cloudring.magic.camera;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;

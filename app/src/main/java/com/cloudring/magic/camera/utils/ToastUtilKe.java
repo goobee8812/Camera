@@ -1,4 +1,4 @@
-package com.cloudring.magic.camera.photograph.utils;
+package com.cloudring.magic.camera.utils;
 
 /**
  * 单例模式Toast.用于及时显示toast

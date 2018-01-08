@@ -1,10 +1,10 @@
-package com.cloudring.magic.camera.photograph.present;
+package com.cloudring.magic.camera.present;
 
 import android.app.Activity;
 import android.hardware.Camera;
 
-import com.cloudring.magic.camera.photograph.PhotographActivity;
-import com.cloudring.magic.camera.photograph.ZXPhotographActivity;
+import com.cloudring.magic.camera.PhotographActivity;
+import com.cloudring.magic.camera.ZXPhotographActivity;
 
 
 public interface PhotographPresent {

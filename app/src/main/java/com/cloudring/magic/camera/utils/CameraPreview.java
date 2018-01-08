@@ -1,4 +1,4 @@
-package com.cloudring.magic.camera.photograph.utils;
+package com.cloudring.magic.camera.utils;
 
 import android.content.Context;
 import android.hardware.Camera;
