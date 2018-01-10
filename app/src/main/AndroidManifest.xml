@@ -44,6 +44,8 @@
             android:name=".CustomRecordActivity"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+
     </application>
 
 </manifest>

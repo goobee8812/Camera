@@ -173,6 +173,9 @@ public class FileManager {
                     continue;
                 }
                 long duration = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[3]));
+                if (duration==0){
+                    continue;
+                }
                 long createTime = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[4])) * 1000;
                 String mimeType = cursor.getString(cursor.getColumnIndex(VIDEO_COLUMN[5]));
                 String title = cursor.getString(cursor.getColumnIndex(VIDEO_COLUMN[6]));

@@ -24,7 +24,6 @@ import android.widget.Toast;
 
 import com.cloudring.magic.camera.utils.ClickProxy;
 import com.cloudring.magic.camera.utils.SpUtil;
-import com.cloudring.magic.camera.utils.VideoUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -269,7 +268,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         startRecord();
                         mRecordControl.setImageResource(R.mipmap.recordvideo_stop);
                         //1s后才能停止
-                        sendBroadcast(new Intent("com.android.Camera2.startVideoRecording"));
                     } else {
                         //停止视频录制
                         mRecordControl.setImageResource(R.mipmap.recordvideo_start);
@@ -281,29 +279,30 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                try {
-                                    if (!(saveVideoPath.equals(""))) {
-                                        String[] str = new String[]{saveVideoPath, currentVideoFilePath};
-                                        VideoUtils.appendVideo(CustomRecordActivity.this, getSDPath(CustomRecordActivity.this) + "append.mp4", str);
-                                        File reName = new File(saveVideoPath);
-                                        File f = new File(getSDPath(CustomRecordActivity.this) + "append.mp4");
-                                        //将合成的视频复制过来
-                                        f.renameTo(reName);
-                                        if (reName.exists()) {
-                                            f.delete();
-                                            new File(currentVideoFilePath).delete();
-                                            MediaScannerConnection.scanFile(CustomRecordActivity.this, new String[]{currentVideoFilePath}, null, null);
-                                        }
-                                    }
-                                    initCamera();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+
+                                initCamera();
+//                                try {
+//                                    if (!(saveVideoPath.equals(""))) {
+//                                        String[] str = new String[]{saveVideoPath, currentVideoFilePath};
+//                                        VideoUtils.appendVideo(CustomRecordActivity.this, getSDPath(CustomRecordActivity.this) + "append.mp4", str);
+//                                        File reName = new File(saveVideoPath);
+//                                        File f = new File(getSDPath(CustomRecordActivity.this) + "append.mp4");
+//                                        //将合成的视频复制过来
+//                                        f.renameTo(reName);
+//                                        if (reName.exists()) {
+//                                            f.delete();
+//                                            new File(currentVideoFilePath).delete();
+//                                            MediaScannerConnection.scanFile(CustomRecordActivity.this, new String[]{currentVideoFilePath}, null, null);
+//                                        }
+//                                    }
+//
+//                                } catch (IOException e) {
+//                                    e.printStackTrace();
+//                                }
                             }
                         }).start();
                     }
                     MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
-                    sendBroadcast(new Intent("com.android.Camera2.stopVideoRecording"));
 
                     mCurrentTime = System.currentTimeMillis();
                 }
@@ -322,6 +321,9 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     }
 
     private boolean back() {
+        if (!isRecording) {
+            return true;
+        }
         if (System.currentTimeMillis() - mCurrentTime > 1200) {
             return true;
         } else {
