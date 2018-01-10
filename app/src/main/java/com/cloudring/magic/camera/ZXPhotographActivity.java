@@ -124,7 +124,12 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     PERMISSIONS_REQUEST_READ_CONTACTS);
         }
 
+        init();
 
+    }
+
+
+    private void init() {
         Intent it = new Intent();
         it.setPackage("com.cloudring.magic");
         it.setAction("com.cloudring.voice.IRemoteService");
@@ -277,6 +282,13 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         PhotographPresentImpl.isPhotoStopThread = true;
         handler.removeCallbacksAndMessages(null);
         unbindService(MyServiceConnection.getInstance().conn);
+        MyServiceConnection.getInstance().remoteService = null;
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer.stop();
+            mMediaPlayer = null;
+        }
+
     }
 
     public void refreshPhotoOne() {
@@ -406,10 +418,10 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     wantTakePic();
                     break;
                 case "com.android.Camera.takePhotoFast"://直接拍照
-                    wantTakePic();
+                    mMediaPlayer.start();
                     break;
                 case "com.android.Camera.closeCamera"://按返回键
-                    finish();
+                    ActivityContainer.getInstance().finishAllActivity();
                     break;
                 case "com.android.Camera.startVideo"://启动录像广播
                     //VoiceTTSManager.getInstance(CommonLib.getContext()).speak("好的,咚咚正在为您打开！");
@@ -495,7 +507,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     animation.cancel();
                     //开始照相
                     photographPresent.takePhoto(mCamera, ZXPhotographActivity.this);
-
                 }
 
 

@@ -10,7 +10,6 @@ import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -23,14 +22,16 @@ import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.cloudring.magic.camera.utils.ClickProxy;
+import com.cloudring.magic.camera.utils.SpUtil;
 import com.cloudring.magic.camera.utils.VideoUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 
 public class CustomRecordActivity extends AppCompatActivity implements View.OnClickListener {
@@ -63,52 +64,15 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private int width = 1280;
     private int height = 720;
 
-
-    private Handler mHandler = new MyHandler(this);
-
-
-    //    private static IaudioState iaudioState;
     private long mCurrentTime;
+    private Handler handler = new Handler();
 
-    public static void setCallBack(com.cloudring.magic.camera.photograph.IaudioState callBack) {
-//        iaudioState = callBack;
-    }
-
-
-    private static class MyHandler extends Handler {
-        private final WeakReference<CustomRecordActivity> mActivity;
-
-        public MyHandler(CustomRecordActivity activity) {
-            mActivity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            System.out.println(msg);
-            if (mActivity.get() == null) {
-                return;
-            }
-            switch (msg.what) {
-                case CONTROL_CODE:
-                    //开启按钮
-                    mActivity.get().mRecordControl.setEnabled(true);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
 
     private MediaRecorder.OnErrorListener OnErrorListener = new MediaRecorder.OnErrorListener() {
         @Override
         public void onError(MediaRecorder mediaRecorder, int what, int extra) {
-            try {
-                if (mediaRecorder != null) {
-                    mediaRecorder.reset();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            System.out.println("onerror");
+            delVideo();
         }
     };
 
@@ -144,7 +108,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         mRecordTime.setVisibility(View.GONE);
         ivBack.setOnClickListener(this);
         ivCamera.setOnClickListener(this);
-        mRecordControl.setOnClickListener(this);
+        mRecordControl.setOnClickListener(new ClickProxy(this));
 
         //配置SurfaceHodler
         mSurfaceHolder = surfaceView.getHolder();
@@ -276,6 +240,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         if (isRecording && mediaRecorder != null) {
             // 设置后不会崩
             mediaRecorder.setOnErrorListener(null);
+            mediaRecorder.setOnInfoListener(null);
             mediaRecorder.setPreviewDisplay(null);
             //停止录制
             mediaRecorder.stop();
@@ -288,7 +253,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             mRecordTime.setVisibility(View.GONE);
             ivCamera.setVisibility(View.VISIBLE);
             isRecording = false;
-
+            System.out.println("stop");
+            SpUtil.writeString("videoPath", "");
         }
     }
 
@@ -297,14 +263,12 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.record_control:
-                if (System.currentTimeMillis() - mCurrentTime > 1000) {
+                if (System.currentTimeMillis() - mCurrentTime > 1200) {
                     if (!isRecording) {
                         //开始录制视频
                         startRecord();
                         mRecordControl.setImageResource(R.mipmap.recordvideo_stop);
-                        mRecordControl.setEnabled(false);
                         //1s后才能停止
-                        mHandler.sendEmptyMessageDelayed(CONTROL_CODE, 1000);
                         sendBroadcast(new Intent("com.android.Camera2.startVideoRecording"));
                     } else {
                         //停止视频录制
@@ -338,20 +302,31 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                             }
                         }).start();
                     }
-//                    MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
+                    MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
                     sendBroadcast(new Intent("com.android.Camera2.stopVideoRecording"));
 
                     mCurrentTime = System.currentTimeMillis();
                 }
                 break;
             case R.id.ivBack:
-                ActivityContainer.getInstance().finishAllActivity();
+                if (back()) {
+                    ActivityContainer.getInstance().finishAllActivity();
+                }
                 break;
             case R.id.ivCamera:
                 finish();
                 break;
             default:
                 break;
+        }
+    }
+
+    private boolean back() {
+        if (System.currentTimeMillis() - mCurrentTime > 1200) {
+            return true;
+        } else {
+            Toast.makeText(this, "录制时间过短！", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
@@ -366,13 +341,34 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     protected void onPause() {
         super.onPause();
 
-        unregisterReceiver(photographBroadCast);
 
+        unregisterReceiver(photographBroadCast);
         if (isRecording) {
-            mCurrentTime = 0;
-            mRecordControl.setEnabled(true);
-            mRecordControl.performClick();
+            mRecordControl.setImageResource(R.mipmap.recordvideo_start);
+            stopRecord();
+            mCamera.lock();
+            stopCamera();
+            mRecordTime.stop();
+            mPauseTime = 0;
+            delVideo();
         }
+    }
+
+    private void delVideo() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    File file = new File(currentVideoFilePath);
+                    //将合成的视频复制过来
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     // 释放相机
@@ -459,8 +455,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         //        //设置录像视频保存地址
         currentVideoFilePath = getSDPath(getApplicationContext()) + getVideoName();
         mediaRecorder.setOutputFile(currentVideoFilePath);
-
-
+        SpUtil.writeString("videoPath", currentVideoFilePath);
 //        mediaRecorder = new MediaRecorder();
 //        mediaRecorder.reset();
 //        mediaRecorder.setCamera(mCamera);
@@ -517,40 +512,57 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     }
 
 
+    private String getRes() {
+        String[] res = {"蛋蛋还是先帮您打开相机吧!", "蛋蛋正在为您打开相机!"};
+        Random random = new Random();// 定义随机类
+        int ran = random.nextInt(2);
+        if (ran == 0) {
+            return res[0];
+        } else if (ran == 1) {
+            return res[1];
+        }
+        return res[1];
+    }
+
     public class PhotographBroadCast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case "com.android.OpenCamera2"://相机语音识别
                 case "com.android.Camera.takePhotoFast"://直接拍照
-                    try {
-                        MyServiceConnection.getInstance().remoteService.speak("蛋蛋还是先帮您打开相机吧！");
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                    ivCamera.performClick();
-                    break;
                 case "com.android.Camera.takePhoto":
-                    try {
-                        MyServiceConnection.getInstance().remoteService.speak("蛋蛋正在为您打开相机！");
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
+                    if (isRecording) {
+                        try {
+                            MyServiceConnection.getInstance().remoteService.speak("正在为您录像呢！");
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            MyServiceConnection.getInstance().remoteService.speak(getRes());
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                        ivCamera.performClick();
                     }
-                    ivCamera.performClick();
                     break;
 
                 case "com.android.Camera.startVideo"://启动录像广播
-                    try {
-                        MyServiceConnection.getInstance().remoteService.speak("好的,蛋蛋正在为您开启录像！");
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        MyServiceConnection.getInstance().remoteService.speak("好的,蛋蛋正在为您开启录像！");
+//                    } catch (RemoteException e) {
+//                        e.printStackTrace();
+//                    }
                     mRecordControl.performClick();
                     break;
 
                 case "com.android.Camera.stopVideo":
                     //VoiceTTSManager.getInstance(CommonLib.getContext()).speak("正在为您打开录像呢！");
                     mRecordControl.performClick();
+                    break;
+
+                case "com.android.Camera.closeCamera"://按返回键
+                    ActivityContainer.getInstance().finishAllActivity();
                     break;
                 default:
                     break;
@@ -564,6 +576,5 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         super.onDestroy();
 
         ActivityContainer.getInstance().removeActivity(this);
-        mHandler.removeCallbacksAndMessages(null);
     }
 }

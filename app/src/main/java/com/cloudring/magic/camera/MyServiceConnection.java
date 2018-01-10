@@ -38,7 +38,7 @@ public class MyServiceConnection {
     ServiceConnection conn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            remoteService = com.cloudring.magicsound.IVoiceAidlInterface.Stub.asInterface(service);
+            remoteService = IVoiceAidlInterface.Stub.asInterface(service);
             try {
                 if (remoteService != null) {
                     remoteService.stopSpeaking();

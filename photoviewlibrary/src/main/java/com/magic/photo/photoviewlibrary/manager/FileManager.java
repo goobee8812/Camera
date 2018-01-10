@@ -169,6 +169,9 @@ public class FileManager {
                 }
                 long id = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[0]));
                 String size = cursor.getString(cursor.getColumnIndex(VIDEO_COLUMN[2]));
+                if (TextUtils.isEmpty(size) || Integer.parseInt(size) < 1024) {
+                    continue;
+                }
                 long duration = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[3]));
                 long createTime = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[4])) * 1000;
                 String mimeType = cursor.getString(cursor.getColumnIndex(VIDEO_COLUMN[5]));
