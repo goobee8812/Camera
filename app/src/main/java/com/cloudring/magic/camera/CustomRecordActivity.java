@@ -82,6 +82,14 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         ActivityContainer.getInstance().addActivity(this);
         initView();
 
+        init();
+    }
+
+    private void init() {
+        Intent it = new Intent();
+        it.setPackage("com.cloudring.magic");
+        it.setAction("com.cloudring.voice.IRemoteService");
+        bindService(it, MyServiceConnection.getInstance().conn, BIND_AUTO_CREATE);
     }
 
 

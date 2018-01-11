@@ -107,7 +107,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zxphotograph);
         ButterKnife.bind(this);
-        initMediaPlayer();
+
 
         ActivityContainer.getInstance().addActivity(this);
 
@@ -125,6 +125,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         }
 
         init();
+        initMediaPlayer();
 
     }
 

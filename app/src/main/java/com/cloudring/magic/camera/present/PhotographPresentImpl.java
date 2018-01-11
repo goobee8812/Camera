@@ -30,6 +30,7 @@ public class PhotographPresentImpl implements PhotographPresent {
     public static boolean takePhotoLock = false;
     public static boolean isPhotoStopThread = false;
 
+
     @Override
     public void takePhoto(Camera camera, final PhotographActivity activity) {
         /**
@@ -94,7 +95,7 @@ public class PhotographPresentImpl implements PhotographPresent {
         Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
-                System.out.println(System.currentTimeMillis());
+
                 final String pictureDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Camera";
                 if (pictureDir == null) {
                     Log.d(TAG, "Error creating media file, check storage permissions!");
@@ -110,25 +111,36 @@ public class PhotographPresentImpl implements PhotographPresent {
                     @Override
                     public void run() {
                         try {
+//                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+//
+//                            final Bitmap modBm = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+//
+//                            Canvas canvas = new Canvas(modBm);
+//
+//                            Paint paint = new Paint();
+//                            Matrix matrix = new Matrix();
+//                            matrix.setScale(-1, 1);//翻转
+//                            matrix.postTranslate(bitmap.getWidth(), 0);
+//
+//                            canvas.drawBitmap(bitmap, matrix, paint);
 
-                            System.out.println(System.currentTimeMillis());
                             FileOutputStream fos = new FileOutputStream(pictureName);
+//                            modBm.compress(Bitmap.CompressFormat.PNG, 90, fos);
                             fos.write(data);
+                            fos.flush();
                             fos.close();
-                            System.out.println(System.currentTimeMillis());
+
 //                            // 把文件插入到系统图库
 //                            try {
 //                                MediaStore.Images.Media.insertImage(activity.getContentResolver(), pictureName, pictureName, null);
 //                            } catch (FileNotFoundException e) {
 //                                e.printStackTrace();
 //                            }
-                            System.out.println(System.currentTimeMillis());
 //                            // 通知图库更新
                             activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    System.out.println(System.currentTimeMillis());
                                     activity.refreshPhotoOne();
                                 }
                             });
@@ -148,6 +160,7 @@ public class PhotographPresentImpl implements PhotographPresent {
         if (camera != null) {
             camera.takePicture(null, null, mPictureCallback);
         }
+
     }
 
     @Override
