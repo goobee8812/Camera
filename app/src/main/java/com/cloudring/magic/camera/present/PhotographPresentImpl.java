@@ -92,7 +92,7 @@ public class PhotographPresentImpl implements PhotographPresent {
         /**
          * 拍照实例
          */
-        Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
+        final Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
 
@@ -158,7 +158,16 @@ public class PhotographPresentImpl implements PhotographPresent {
             }
         };
         if (camera != null) {
-            camera.takePicture(null, null, mPictureCallback);
+            camera.autoFocus(new Camera.AutoFocusCallback() {
+
+                public void onAutoFocus(boolean success, Camera camera) {
+                    // TODO Auto-generated method stub
+                    if (success) {
+                        camera.takePicture(null, null, mPictureCallback);
+                    }
+                }
+            });
+
         }
 
     }

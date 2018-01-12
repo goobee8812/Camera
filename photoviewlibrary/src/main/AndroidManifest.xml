@@ -15,26 +15,32 @@
 
         <activity
             android:name=".activity.PhotoMainAvtivity"
+            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/PhotoAppTheme" />
         <activity
             android:name=".activity.PhotoShowImagesActivity"
+            android:screenOrientation="landscape"
             android:theme="@style/PhotoAppTheme" />
 
         <activity
             android:name=".activity.VideoActivity"
+            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/PhotoAppTheme" />
         <activity
             android:name=".activity.VideoListActivity"
+            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/PhotoAppTheme" />
         <activity
             android:name=".activity.PhotoMainActivity"
+            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/PhotoAppTheme" />
         <activity
             android:name=".activity.CheckImageActivity"
+            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/PhotoAppTheme" />
 
