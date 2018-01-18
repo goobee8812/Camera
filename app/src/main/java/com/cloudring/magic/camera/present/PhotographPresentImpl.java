@@ -87,7 +87,7 @@ public class PhotographPresentImpl implements PhotographPresent {
     }
 
     @Override
-    public void takePhoto(Camera camera, final ZXPhotographActivity activity) {
+    public void takePhoto(Camera camera, final ZXPhotographActivity activity , final SaveCallback callback) {
 
         /**
          * 拍照实例
@@ -108,16 +108,10 @@ public class PhotographPresentImpl implements PhotographPresent {
                     fos.close();
                     camera.startPreview();//拍照完毕以后需要再次开启preview以保证拍照以后继续给surfaceView传递摄像数据
                     // 通知图库更新
-                    activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            activity.refreshPhoto(pictureName);
-                        }
-                    });
-
+                    callback.success(pictureName);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    callback.onError(e);
                 }
             }
         };
@@ -198,7 +192,7 @@ public class PhotographPresentImpl implements PhotographPresent {
     }
 
     @Override
-    public void takePhotoDelay(final int delaySec, final Camera camera, final ZXPhotographActivity activity) {
+    public void takePhotoDelay(final int delaySec, final Camera camera, final ZXPhotographActivity activity, final SaveCallback callback) {
         final int[] time = {delaySec};
         final Timer timer = new Timer();
         ToastUtilKe.init(activity);
@@ -218,7 +212,7 @@ public class PhotographPresentImpl implements PhotographPresent {
                             });
                         }
                         if (time[0] == 0) {//如果现在已经达到了设定好的延迟时间
-                            takePhoto(camera, activity);
+                            takePhoto(camera, activity,callback);
                             takePhotoLock = false;
                             timer.cancel();
                         }

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.cloudring.magic.camera.present.PhotographPresent;
 import com.cloudring.magic.camera.present.PhotographPresentImpl;
+import com.cloudring.magic.camera.present.SaveCallback;
 import com.cloudring.magic.camera.utils.CameraPreview;
 import com.cloudring.magic.camera.utils.PhotoEntity;
 import com.cloudring.magic.camera.utils.ScanPhoto;
@@ -42,7 +44,7 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto.LookUpPhotosCallback {
+public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto.LookUpPhotosCallback , SaveCallback{
     public static final String TAG = "ZXPhotographActivity";
 
     @BindView(R.id.ivPhotoAlbum)
@@ -171,18 +173,18 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             case R.id.ivTakingPictures:
                 if (isDelay3) {
                     //延迟三秒
-                    photographPresent.takePhotoDelay(3, mCamera, this);
+                    photographPresent.takePhotoDelay(3, mCamera, this,this);
                     PhotographPresentImpl.takePhotoLock = true;
                 }
                 if (isDelay6) {
                     //延迟六秒
-                    photographPresent.takePhotoDelay(6, mCamera, this);
+                    photographPresent.takePhotoDelay(6, mCamera, this,this);
                     PhotographPresentImpl.takePhotoLock = true;
                 }
                 if (!isDelay3 && !isDelay6) {
                     //正常拍摄
                     if (System.currentTimeMillis() - mCurrentTime > 1000) {
-                        photographPresent.takePhoto(mCamera, this);
+                        photographPresent.takePhoto(mCamera, this,this);
                         mCurrentTime = System.currentTimeMillis();
                     }
                 }
@@ -336,6 +338,17 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         Glide.with(ZXPhotographActivity.this).load(new File(photoArrayList.get(0).url)).into(ivPhotoAlbum);
     }
 
+    @Override
+    public void success(String photoPath) {
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + photoPath)));
+        refreshPhoto(photoPath);
+    }
+
+    @Override
+    public void onError(Exception e) {
+
+    }
+
 
     public class PhotographBroadCast extends BroadcastReceiver {
         @Override
@@ -406,7 +419,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                 if (animation != null) {     //animation为null此时是直接进入相机进行拍照
                     animation.cancel();
                     //开始照相
-                    photographPresent.takePhoto(mCamera, ZXPhotographActivity.this);
+                    photographPresent.takePhoto(mCamera, ZXPhotographActivity.this,ZXPhotographActivity.this);
                 }
 
 
