@@ -12,6 +12,7 @@ import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.cloudring.magic.camera.CustomRecordActivity;
+import com.cloudring.magic.camera.MyApp;
 import com.cloudring.magic.camera.PhotographActivity;
 import com.cloudring.magic.camera.ZXPhotographActivity;
 import com.cloudring.magic.camera.utils.ToastUtilKe;
@@ -26,9 +27,9 @@ import java.util.TimerTask;
 
 
 public class PhotographPresentImpl implements PhotographPresent {
-    public static final String TAG = "PhotographPresentImpl";
-    public static boolean takePhotoLock = false;
-    public static boolean isPhotoStopThread = false;
+    public static final String  TAG               = "PhotographPresentImpl";
+    public static       boolean takePhotoLock     = false;
+    public static       boolean isPhotoStopThread = false;
 
 
     @Override
@@ -97,46 +98,21 @@ public class PhotographPresentImpl implements PhotographPresent {
             public void onPictureTaken(final byte[] data, Camera camera) {
 
                 final String pictureDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Camera";
-                if (pictureDir == null) {
-                    Log.d(TAG, "Error creating media file, check storage permissions!");
-                    return;
-                }
                 File f = new File(pictureDir);
                 if (!f.exists()) {
                     f.mkdir();
                 }
                 final String pictureName = pictureDir + File.separator + DateFormat.format("yyyyMMddHHmmss", new Date()).toString() + ".png";
 
-                new Thread(new Runnable() {
+                MyApp.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
-//                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-//
-//                            final Bitmap modBm = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
-//
-//                            Canvas canvas = new Canvas(modBm);
-//
-//                            Paint paint = new Paint();
-//                            Matrix matrix = new Matrix();
-//                            matrix.setScale(-1, 1);//翻转
-//                            matrix.postTranslate(bitmap.getWidth(), 0);
-//
-//                            canvas.drawBitmap(bitmap, matrix, paint);
-
                             FileOutputStream fos = new FileOutputStream(pictureName);
-//                            modBm.compress(Bitmap.CompressFormat.PNG, 90, fos);
                             fos.write(data);
                             fos.flush();
                             fos.close();
-
-//                            // 把文件插入到系统图库
-//                            try {
-//                                MediaStore.Images.Media.insertImage(activity.getContentResolver(), pictureName, pictureName, null);
-//                            } catch (FileNotFoundException e) {
-//                                e.printStackTrace();
-//                            }
-//                            // 通知图库更新
+                            // 通知图库更新
                             activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
                             activity.runOnUiThread(new Runnable() {
                                 @Override
@@ -152,24 +128,13 @@ public class PhotographPresentImpl implements PhotographPresent {
                             Log.d(TAG, "Error accessing file: " + e.getMessage());
                         }
                     }
-                }).start();
+                });
+
                 if (camera != null)
                     camera.startPreview();//拍照完毕以后需要再次开启preview以保证拍照以后继续给surfaceView传递摄像数据
             }
         };
-        if (camera != null) {
-            camera.autoFocus(new Camera.AutoFocusCallback() {
-
-                public void onAutoFocus(boolean success, Camera camera) {
-                    // TODO Auto-generated method stub
-                    if (success) {
-                        camera.takePicture(null, null, mPictureCallback);
-                    }
-                }
-            });
-
-        }
-
+        camera.takePicture(null, null, mPictureCallback);
     }
 
     @Override

@@ -106,8 +106,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         if (isRecording) {
             mRecordControl.setImageResource(R.mipmap.recordvideo_start);
             stopRecord();
-            mCamera.unlock();
-            mPauseTime = 0;
+            mCamera.lock();
             delVideo();
         }
         stopCamera();
@@ -214,7 +213,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     public void startRecord() {
         sendBroadcast(new Intent("com.android.Camera.startvideo"));
         initCamera();
-        mCamera.lock();
+        mCamera.unlock();
         setConfigRecord();
         try {
             //开始录制
@@ -256,6 +255,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             mRecordTime.setVisibility(View.GONE);
             ivCamera.setVisibility(View.VISIBLE);
             isRecording = false;
+            mPauseTime = 0;
             System.out.println("stop");
             SpUtil.writeString("videoPath", "");
         }
@@ -276,16 +276,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         //停止视频录制
                         mRecordControl.setImageResource(R.mipmap.recordvideo_start);
                         stopRecord();
-                        mCamera.unlock();
-                        stopCamera();
-                        mRecordTime.stop();
-                        mPauseTime = 0;
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                initCamera();
-                            }
-                        }).start();
+                        mCamera.lock();
+
                     }
                     MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
 
