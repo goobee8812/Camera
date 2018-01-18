@@ -12,7 +12,6 @@ import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.cloudring.magic.camera.CustomRecordActivity;
-import com.cloudring.magic.camera.MyApp;
 import com.cloudring.magic.camera.PhotographActivity;
 import com.cloudring.magic.camera.ZXPhotographActivity;
 import com.cloudring.magic.camera.utils.ToastUtilKe;
@@ -95,43 +94,31 @@ public class PhotographPresentImpl implements PhotographPresent {
          */
         final Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
             @Override
-            public void onPictureTaken(final byte[] data, Camera camera) {
-
+            public void onPictureTaken(final byte[] data, final Camera camera) {
                 final String pictureDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Camera";
                 File f = new File(pictureDir);
                 if (!f.exists()) {
                     f.mkdir();
                 }
                 final String pictureName = pictureDir + File.separator + DateFormat.format("yyyyMMddHHmmss", new Date()).toString() + ".png";
-
-                MyApp.getThreadPool().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            FileOutputStream fos = new FileOutputStream(pictureName);
-                            fos.write(data);
-                            fos.flush();
-                            fos.close();
-                            // 通知图库更新
-                            activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    activity.refreshPhotoOne();
-                                }
-                            });
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                            Log.d(TAG, "File not found: " + e.getMessage());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Log.d(TAG, "Error accessing file: " + e.getMessage());
-                        }
-                    }
-                });
-
-                if (camera != null)
+                try {
+                    FileOutputStream fos = new FileOutputStream(pictureName);
+                    fos.write(data);
+                    fos.flush();
+                    fos.close();
                     camera.startPreview();//拍照完毕以后需要再次开启preview以保证拍照以后继续给surfaceView传递摄像数据
+                    // 通知图库更新
+                    activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.refreshPhoto(pictureName);
+                        }
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         };
         camera.takePicture(null, null, mPictureCallback);

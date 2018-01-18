@@ -248,6 +248,10 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         }, 500);
     }
 
+    public void refreshPhoto(String photoPath){
+        Glide.with(ZXPhotographActivity.this).load(photoPath).into(ivPhotoAlbum);
+    }
+
     // 判断相机是否支持
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(
