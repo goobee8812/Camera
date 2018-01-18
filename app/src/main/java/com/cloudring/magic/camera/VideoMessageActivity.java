@@ -54,8 +54,6 @@ public class VideoMessageActivity extends Activity implements OnClickListener, S
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom);
-
-        ActivityContainer.getInstance().addActivity(this);
         initView();
 
 
@@ -233,7 +231,7 @@ public class VideoMessageActivity extends Activity implements OnClickListener, S
             finish();
         } else if (id == R.id.ivBack) {
             if (back()) {
-                ActivityContainer.getInstance().finishAllActivity();
+                finish();
             }
         }
     }
@@ -350,7 +348,7 @@ public class VideoMessageActivity extends Activity implements OnClickListener, S
                     break;
 
                 case "com.android.Camera.closeCamera"://按返回键
-                    ActivityContainer.getInstance().finishAllActivity();
+                    finish();
                     break;
                 default:
                     break;

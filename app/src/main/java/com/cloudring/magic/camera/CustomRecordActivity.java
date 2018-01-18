@@ -69,7 +69,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom);
-        ActivityContainer.getInstance().addActivity(this);
         initView();
 
         init();
@@ -86,14 +85,9 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onResume() {
         super.onResume();
-
-//        iaudioState.mode(0);
         sendBroadcast(new Intent("com.android.Camera.stopvideo"));
-
         registerReceiver();
-
         initCamera();
-
     }
 
     private void initView() {
@@ -277,26 +271,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-
                                 initCamera();
-//                                try {
-//                                    if (!(saveVideoPath.equals(""))) {
-//                                        String[] str = new String[]{saveVideoPath, currentVideoFilePath};
-//                                        VideoUtils.appendVideo(CustomRecordActivity.this, getSDPath(CustomRecordActivity.this) + "append.mp4", str);
-//                                        File reName = new File(saveVideoPath);
-//                                        File f = new File(getSDPath(CustomRecordActivity.this) + "append.mp4");
-//                                        //将合成的视频复制过来
-//                                        f.renameTo(reName);
-//                                        if (reName.exists()) {
-//                                            f.delete();
-//                                            new File(currentVideoFilePath).delete();
-//                                            MediaScannerConnection.scanFile(CustomRecordActivity.this, new String[]{currentVideoFilePath}, null, null);
-//                                        }
-//                                    }
-//
-//                                } catch (IOException e) {
-//                                    e.printStackTrace();
-//                                }
                             }
                         }).start();
                     }
@@ -307,7 +282,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.ivBack:
                 if (back()) {
-                    ActivityContainer.getInstance().finishAllActivity();
+                    finish();
                 }
                 break;
             case R.id.ivCamera:
@@ -333,8 +308,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
-        ActivityContainer.getInstance().finishAllActivity();
     }
 
     @Override
@@ -445,58 +418,12 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         //mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
         // 设置视频录制的分辨率。必须放在设置编码和格式的后面，否则报错
         mediaRecorder.setVideoSize(width, height);
-        //mediarecorder.setVideoEncodingBitRate(bitRat);
-        // 设置录制的视频帧率。必须放在设置编码和格式的后面，否则报错
-//					if (fps != 0) {
-//						mediarecorder.setVideoFrameRate(fps);
-//					}
-        //mediarecorder.setOrientationHint(90);
         mediaRecorder.setPreviewDisplay(surfaceView.getHolder().getSurface());
         //        //设置录像视频保存地址
         currentVideoFilePath = getSDPath(getApplicationContext()) + getVideoName();
         mediaRecorder.setOutputFile(currentVideoFilePath);
         SpUtil.writeString("videoPath", currentVideoFilePath);
-//        mediaRecorder = new MediaRecorder();
-//        mediaRecorder.reset();
-//        mediaRecorder.setCamera(mCamera);
-//        mediaRecorder.setOnErrorListener(OnErrorListener);
-//
-//        //使用SurfaceView预览
-//        mediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
-//
-//        //1.设置采集声音
-//        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//        //设置采集图像
-//        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-//        //2.设置视频，音频的输出格式 mp4
-//        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-//        //3.设置音频的编码格式
-//        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-//        //设置图像的编码格式
-//        mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-//        //设置立体声
-//        //        mediaRecorder.setAudioChannels(2);
-//        //设置最大录像时间 单位：毫秒
-//        //        mediaRecorder.setMaxDuration(60 * 1000);
-//        //设置最大录制的大小 单位，字节
-//        //        mediaRecorder.setMaxFileSize(1024 * 1024);
-//        //音频一秒钟包含多少数据位
-//        CamcorderProfile mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
-//        mediaRecorder.setAudioEncodingBitRate(44100);
-//        if (mProfile.videoBitRate > 2 * 1024 * 1024) {
-//            mediaRecorder.setVideoEncodingBitRate(2 * 1024 * 1024);
-//        } else {
-//            mediaRecorder.setVideoEncodingBitRate(1024 * 1024);
-//        }
-//        mediaRecorder.setVideoFrameRate(mProfile.videoFrameRate);
-//
-//        //设置选择角度，顺时针方向，因为默认是逆向90度的，这样图像就是正常显示了,这里设置的是观看保存后的视频的角度
-//        mediaRecorder.setOrientationHint(0);
-//        //设置录像的分辨率
-//        mediaRecorder.setVideoSize(640, 480);
-//        //设置录像视频保存地址
-//        currentVideoFilePath = getSDPath(getApplicationContext()) + getVideoName();
-//        mediaRecorder.setOutputFile(currentVideoFilePath);
+
     }
 
     private String getVideoName() {
@@ -562,7 +489,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                     break;
 
                 case "com.android.Camera.closeCamera"://按返回键
-                    ActivityContainer.getInstance().finishAllActivity();
+                    finish();
                     break;
                 default:
                     break;
@@ -574,7 +501,5 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        ActivityContainer.getInstance().removeActivity(this);
     }
 }

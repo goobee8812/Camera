@@ -1,7 +1,5 @@
 package com.cloudring.magic.camera;
 
-import android.Manifest;
-import android.app.Instrumentation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,13 +10,11 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -29,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cloudring.magic.camera.photograph.IaudioState;
 import com.cloudring.magic.camera.present.PhotographPresent;
 import com.cloudring.magic.camera.present.PhotographPresentImpl;
 import com.cloudring.magic.camera.utils.CameraPreview;
@@ -48,16 +43,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto.LookUpPhotosCallback {
-    public static final int TAKE_PHOTO = 1;
-    public static final int CHOOSE_PHOTO = 2;
-    public static final int RECORDING = 3;
     public static final String TAG = "ZXPhotographActivity";
-    boolean isDelay3 = false;
-    boolean isDelay6 = false;
-    @BindView(R.id.ivDelay)
-    ImageView ivDelay;
+
     @BindView(R.id.ivPhotoAlbum)
     public CircleImageView ivPhotoAlbum;
+    @BindView(R.id.ivDelay)
+    ImageView ivDelay;
     @BindView(R.id.llDelaySetting)
     LinearLayout flDelaySetting;
     @BindView(R.id.ivDelayClose)
@@ -76,85 +67,91 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     TextView tvDelay6s;
     @BindView(R.id.timedown)
     TextView teTimeDown;
-
     @BindColor(R.color.photo_delay_text_color_red)
     int delayColorRed;
     @BindColor(R.color.photo_delay_text_color_white)
     int delayColorWhite;
+
+    boolean isDelay3 = false;
+    boolean isDelay6 = false;
     private int count = 6;
     private Animation animation;   //动画
     private long mCurrentTime;
-
-    private int result_code = 0;
     private Camera mCamera;
     private CameraPreview mPreview;
     private FrameLayout mCameralayout;
     private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;//默认使用前置摄像头(咚咚机器人神坑,CAMERA_FACING_BACK明明应该是后置....d)
-    PhotographPresent photographPresent = new PhotographPresentImpl();
     private PhotographBroadCast photographBroadCast;
-    private IntentFilter filter;
-    private MediaPlayer mMediaPlayer;
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 3;
+    private MediaPlayer  mMediaPlayer;
 
-//    private static IaudioState iaudioState;
+    PhotographPresent photographPresent = new PhotographPresentImpl();
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+                if (count == 0) {
+                    return false;
+                }
+                int numNow = getCount();
+                if (numNow != 0) {
+                    teTimeDown.setText("" + numNow);
+                    handler.sendEmptyMessageDelayed(1, 1000);
+                    big();
+                }
 
-    public static void setCallBack(IaudioState callBack) {
-//        iaudioState = callBack;
-    }
+
+            return false;
+        }
+    });
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zxphotograph);
         ButterKnife.bind(this);
-
-
-        ActivityContainer.getInstance().addActivity(this);
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA,
-                            Manifest.permission.RECORD_AUDIO,
-                            Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PERMISSIONS_REQUEST_READ_CONTACTS);
-        }
-
-        init();
+        bindVoiceService();
         initMediaPlayer();
-
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(this);
+        initCamera();
+        refreshPhotoOne();
+        PhotographPresentImpl.isPhotoStopThread = false;
+        initReceiver();
+    }
 
-    private void init() {
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(null);
+        releaseCamera();
+        PhotographPresentImpl.isPhotoStopThread = true;
+        handler.removeCallbacksAndMessages(null);
+        unRegisterReceiver();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releaseCamera();
+        PhotographPresentImpl.isPhotoStopThread = true;
+        handler.removeCallbacksAndMessages(null);
+        unbindService(MyServiceConnection.getInstance().conn);
+        MyServiceConnection.getInstance().remoteService = null;
+        if (mMediaPlayer != null) {
+            mMediaPlayer.stop();
+            mMediaPlayer.release();
+        }
+    }
+
+    private void bindVoiceService() {
         Intent it = new Intent();
         it.setPackage("com.cloudring.magic");
         it.setAction("com.cloudring.voice.IRemoteService");
         bindService(it, MyServiceConnection.getInstance().conn, BIND_AUTO_CREATE);
     }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_READ_CONTACTS: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                } else {
-                    finish();
-                }
-                return;
-            }
-        }
-    }
-
 
     @OnClick({R.id.ivDelay, R.id.ivPhotoAlbum, R.id.ivBack, R.id.ivTakingPictures, R.id.ivRecording, R.id.flDelayClose, R.id.flDelay3s, R.id.flDelay6S})
     public void onViewClicked(View view) {
@@ -171,7 +168,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                 releaseCamera();
                 break;
             case R.id.ivBack:
-                ActivityContainer.getInstance().finishAllActivity();
+                finish();
                 break;
             case R.id.ivTakingPictures:
                 if (isDelay3) {
@@ -191,7 +188,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                         mCurrentTime = System.currentTimeMillis();
                     }
                 }
-                result_code = 1001;
                 break;
             case R.id.ivRecording:
                 photographPresent.reCording(this);
@@ -231,41 +227,10 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(this);
-        initCamera();
-        refreshPhotoOne();
-        PhotographPresentImpl.isPhotoStopThread = false;
-
-        initReceiver();
-
-
-
-    }
-
     private void initReceiver() {
-
+        registerReceiver();
         Intent intent = new Intent("com.android.OpenCamera");
         sendBroadcast(intent);
-
-        registerReceiver();
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(null);
-        releaseCamera();
-        PhotographPresentImpl.isPhotoStopThread = true;
-        handler.removeCallbacksAndMessages(null);
-//        iaudioState.mode(0);
-
-        unRegisterReceiver();
     }
 
     private void unRegisterReceiver() {
@@ -274,23 +239,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         }
         Intent intent = new Intent("com.android.CloseCamera");
         sendBroadcast(intent);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        releaseCamera();
-        PhotographPresentImpl.isPhotoStopThread = true;
-        handler.removeCallbacksAndMessages(null);
-        unbindService(MyServiceConnection.getInstance().conn);
-        MyServiceConnection.getInstance().remoteService = null;
-
-        if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
-            mMediaPlayer = null;
-        }
-
     }
 
     public void refreshPhotoOne() {
@@ -315,8 +263,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
 
     public void initCamera() {
         if (!checkCameraHardware(this)) {
-            Toast.makeText(this, "相机不支持", Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, "相机不支持", Toast.LENGTH_SHORT).show();
         } else {
             openCamera();
         }
@@ -326,13 +273,9 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     public void openCamera() {
         if (mCamera == null) {
             mCamera = getCameraInstance();
-            //            mPreview = new CameraPreview(ZXPhotographActivity.this, mCamera);
-            //            mCameralayout = (FrameLayout) findViewById(R.id.camera_preview);
-            //            mCameralayout.addView(mPreview);
         }
 
         if (mPreview == null) {
-
             mPreview = new CameraPreview(ZXPhotographActivity.this, mCamera);
 
         }
@@ -354,23 +297,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         return c;
     }
 
-    /**
-     * 前后置摄像头转换
-     */
-    public void switchCamera() {
-        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        Camera.getCameraInfo(mCameraId, cameraInfo);
-        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-            mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
-        } else {
-            mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-        }
-        mCameralayout.removeView(mPreview);
-        releaseCamera();
-        openCamera();
-    }
-
-
     // 释放相机
     public void releaseCamera() {
         long lastTime = System.currentTimeMillis();
@@ -388,7 +314,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     }
 
     public void registerReceiver() {
-        filter = new IntentFilter();
+        IntentFilter filter = new IntentFilter();
         filter.addAction("com.android.Camera.takePhoto");
         filter.addAction("com.android.Camera.takePhotoFast");
         filter.addAction("com.android.Camera.closeCamera");
@@ -423,7 +349,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     mMediaPlayer.start();
                     break;
                 case "com.android.Camera.closeCamera"://按返回键
-                    ActivityContainer.getInstance().finishAllActivity();
+                    finish();
                     break;
                 case "com.android.Camera.startVideo"://启动录像广播
                     //VoiceTTSManager.getInstance(CommonLib.getContext()).speak("好的,咚咚正在为您打开！");
@@ -442,36 +368,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             }
         }
     }
-
-    public void backRunnable() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Instrumentation inst = new Instrumentation();
-                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            if (count == 0) {
-                return;
-            }
-            int numNow = getCount();
-            if (numNow != 0) {
-                teTimeDown.setText("" + numNow);
-                handler.sendEmptyMessageDelayed(1, 1000);
-                big();
-            }
-
-        }
-    };
 
     private int getCount() {
         count--;

@@ -53,7 +53,6 @@ public class UnCeHandler implements Thread.UncaughtExceptionHandler {
 //            AlarmManager mgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
 //            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
 //                    restartIntent); // 1秒钟后重启应用
-//            ActivityContainer.getInstance().finishAllActivity();
             System.exit(0);
         }
     }
