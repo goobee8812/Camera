@@ -34,35 +34,47 @@ import java.util.Random;
 
 public class CustomRecordActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "CustomRecordActivity";
     public static final int CONTROL_CODE = 1;
+    private static final String TAG = "CustomRecordActivity";
+
+
     //UI
     private ImageView mRecordControl;
-    private ImageView ivBack;
-    private ImageView ivCamera;
-    private SurfaceView surfaceView;
+    private ImageView     ivBack;
+    private ImageView     ivCamera;
+    private SurfaceView   surfaceView;
     private SurfaceHolder mSurfaceHolder;
-    private Chronometer mRecordTime;
-
+    private Chronometer   mRecordTime;
     //DATA
     private boolean isRecording;// 标记，判断当前是否正在录制
-    private boolean isPause; //暂停标识
     private long mPauseTime = 0;           //录制暂停时间间隔
-
     // 存储文件
     private File mVecordFile;
     private Camera mCamera;
     private MediaRecorder mediaRecorder;
     private String currentVideoFilePath;
-    private String saveVideoPath = "";
-
-
     private PhotographBroadCast photographBroadCast;
-    private IntentFilter filter;
-    private int width = 1280;
-    private int height = 720;
-
+    private int  width  = 1280;
+    private int  height = 720;
     private long mCurrentTime;
+    private SurfaceHolder.Callback mCallBack = new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceCreated(SurfaceHolder surfaceHolder) {
+            initCamera();
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+            if (mSurfaceHolder.getSurface() == null) {
+                return;
+            }
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+            stopCamera();
+        }
+    };
 
 
     @Override
@@ -70,17 +82,14 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom);
         initView();
-
-        init();
+        bindVoiceService();
     }
 
-    private void init() {
-        Intent it = new Intent();
-        it.setPackage("com.cloudring.magic");
-        it.setAction("com.cloudring.voice.IRemoteService");
-        bindService(it, MyServiceConnection.getInstance().conn, BIND_AUTO_CREATE);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(MyServiceConnection.getInstance().conn);
     }
-
 
     @Override
     protected void onResume() {
@@ -89,6 +98,29 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         registerReceiver();
         initCamera();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(photographBroadCast);
+        if (isRecording) {
+            mRecordControl.setImageResource(R.mipmap.recordvideo_start);
+            stopRecord();
+            mCamera.unlock();
+            mPauseTime = 0;
+            delVideo();
+        }
+        stopCamera();
+
+    }
+
+    private void bindVoiceService() {
+        Intent it = new Intent();
+        it.setPackage("com.cloudring.magic");
+        it.setAction("com.cloudring.voice.IRemoteService");
+        bindService(it, MyServiceConnection.getInstance().conn, BIND_AUTO_CREATE);
+    }
+
 
     private void initView() {
         surfaceView = (SurfaceView) findViewById(R.id.record_surfaceView);
@@ -113,28 +145,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-    private SurfaceHolder.Callback mCallBack = new SurfaceHolder.Callback() {
-        @Override
-        public void surfaceCreated(SurfaceHolder surfaceHolder) {
-            initCamera();
-        }
-
-        @Override
-        public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
-            if (mSurfaceHolder.getSurface() == null) {
-                return;
-            }
-        }
-
-        @Override
-        public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-            stopCamera();
-        }
-    };
-
-
     public void registerReceiver() {
-        filter = new IntentFilter();
+        IntentFilter filter = new IntentFilter();
         filter.addAction("com.android.Camera.takePhoto");
         filter.addAction("com.android.Camera.takePhotoFast");
         filter.addAction("com.android.Camera.closeCamera");
@@ -202,7 +214,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     public void startRecord() {
         sendBroadcast(new Intent("com.android.Camera.startvideo"));
         initCamera();
-        mCamera.unlock();
+        mCamera.lock();
         setConfigRecord();
         try {
             //开始录制
@@ -264,7 +276,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         //停止视频录制
                         mRecordControl.setImageResource(R.mipmap.recordvideo_start);
                         stopRecord();
-                        mCamera.lock();
+                        mCamera.unlock();
                         stopCamera();
                         mRecordTime.stop();
                         mPauseTime = 0;
@@ -308,23 +320,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-
-        unregisterReceiver(photographBroadCast);
-        if (isRecording) {
-            mRecordControl.setImageResource(R.mipmap.recordvideo_start);
-            stopRecord();
-            mCamera.lock();
-            stopCamera();
-            mRecordTime.stop();
-            mPauseTime = 0;
-            delVideo();
-        }
     }
 
     private void delVideo() {
@@ -498,8 +493,4 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }

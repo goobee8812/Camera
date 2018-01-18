@@ -97,9 +97,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     handler.sendEmptyMessageDelayed(1, 1000);
                     big();
                 }
-
-
-            return false;
+            return true;
         }
     });
 
