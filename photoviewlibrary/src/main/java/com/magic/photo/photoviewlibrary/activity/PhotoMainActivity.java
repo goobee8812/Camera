@@ -16,7 +16,7 @@ import com.magic.photo.photoviewlibrary.fragments.VideoFragment;
 import me.yokeyword.fragmentation.SupportActivity;
 import me.yokeyword.fragmentation.SupportFragment;
 
-public class PhotoMainActivity extends SupportActivity implements TabLayout.OnTabSelectedListener, ImageFragment.OnPhotoSelectChangeListener {
+public class PhotoMainActivity extends SupportActivity implements TabLayout.OnTabSelectedListener, ImageFragment.OnPhotoSelectChangeListener, VideoFragment.OnVideoSelectChangeListener {
 
     private TabLayout mTabLayout;
     private SupportFragment[] mFragments;
@@ -26,6 +26,7 @@ public class PhotoMainActivity extends SupportActivity implements TabLayout.OnTa
     private ImageFragment mImageFragment;
     private TextView tvCount;
     private TextView tvSel;
+    private VideoFragment mVideoFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,7 +40,8 @@ public class PhotoMainActivity extends SupportActivity implements TabLayout.OnTa
         ivCancel = (ImageView) findViewById(R.id.iv_cancel);
         mImageFragment = ImageFragment.newInstance();
         mImageFragment.setOnPhotoSelectChangeListener(this);
-        VideoFragment mVideoFragment = VideoFragment.newInstance();
+        mVideoFragment = VideoFragment.newInstance();
+        mVideoFragment.setOnVideoSelectChangeListener(this);
         mFragments = new SupportFragment[]{mImageFragment, mVideoFragment};
         loadMultipleRootFragment(R.id.framelayout_content, 0, mFragments);
         mTabLayout.addOnTabSelectedListener(this);
@@ -53,6 +55,7 @@ public class PhotoMainActivity extends SupportActivity implements TabLayout.OnTa
             @Override
             public void onClick(View v) {
                 mImageFragment.cancelPhotoSelect();
+                mVideoFragment.cancelVideoSelect();
                 cancelPhotoSelect();
             }
         });
@@ -69,16 +72,29 @@ public class PhotoMainActivity extends SupportActivity implements TabLayout.OnTa
         rlSelect.setVisibility(View.GONE);
     }
 
-    public void showSelectPhototCount(int count) {
+    public void showSelectPhotoCount(int count) {
         if (count == 0) {
             tvSel.setText("未选择");
             tvCount.setVisibility(View.GONE);
-            mImageFragment.noPhototSelect();
+            mImageFragment.noPhotoSelect();
         } else {
             tvSel.setText("已选择");
             tvCount.setVisibility(View.VISIBLE);
             tvCount.setText(count + "");
             mImageFragment.photoSelect();
+        }
+    }
+
+    public void showSelectVideoCount(int count) {
+        if (count == 0) {
+            tvSel.setText("未选择");
+            tvCount.setVisibility(View.GONE);
+            mVideoFragment.noVideoSelect();
+        } else {
+            tvSel.setText("已选择");
+            tvCount.setVisibility(View.VISIBLE);
+            tvCount.setText(count + "");
+            mVideoFragment.videoSelect();
         }
     }
 
@@ -111,6 +127,11 @@ public class PhotoMainActivity extends SupportActivity implements TabLayout.OnTa
 
     @Override
     public void onPhotoSelectChange(int count) {
-        showSelectPhototCount(count);
+        showSelectPhotoCount(count);
+    }
+
+    @Override
+    public void onVideoSelectChange(int count) {
+        showSelectVideoCount(count);
     }
 }

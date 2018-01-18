@@ -9,7 +9,6 @@ import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -64,16 +63,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private int height = 720;
 
     private long mCurrentTime;
-    private Handler handler = new Handler();
 
-
-    private MediaRecorder.OnErrorListener OnErrorListener = new MediaRecorder.OnErrorListener() {
-        @Override
-        public void onError(MediaRecorder mediaRecorder, int what, int extra) {
-            System.out.println("onerror");
-            delVideo();
-        }
-    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

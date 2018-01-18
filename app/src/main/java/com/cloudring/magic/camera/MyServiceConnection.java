@@ -38,14 +38,16 @@ public class MyServiceConnection {
     ServiceConnection conn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            remoteService = IVoiceAidlInterface.Stub.asInterface(service);
-            try {
-                if (remoteService != null) {
-                    remoteService.stopSpeaking();
-                    remoteService.speak("蛋蛋可以帮您拍照,也可以帮您录像");
+            if (remoteService==null){
+                remoteService = IVoiceAidlInterface.Stub.asInterface(service);
+                try {
+                    if (remoteService != null) {
+                        remoteService.stopSpeaking();
+                        remoteService.speak("蛋蛋可以帮您拍照,也可以帮您录像");
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
                 }
-            } catch (RemoteException e) {
-                e.printStackTrace();
             }
         }
 

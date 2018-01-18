@@ -173,7 +173,7 @@ public class FileManager {
                     continue;
                 }
                 long duration = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[3]));
-                if (duration==0){
+                if (duration == 0) {
                     continue;
                 }
                 long createTime = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[4])) * 1000;
@@ -198,7 +198,7 @@ public class FileManager {
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 String path = cursor.getString(cursor.getColumnIndex(IMAGE_COLUMN[1]));
-                if (!new File(path).exists()) {
+                if (!new File(path).exists() || (path.contains("wyt") && path.contains("flash"))) {
                     continue;
                 }
                 long id = cursor.getLong(cursor.getColumnIndex(IMAGE_COLUMN[0]));

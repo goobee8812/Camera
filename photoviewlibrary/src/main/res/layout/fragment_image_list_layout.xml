@@ -18,21 +18,31 @@
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
-        android:layout_marginLeft="280dp"
-        android:layout_marginRight="280dp"
+        android:layout_marginLeft="200dp"
+        android:layout_marginRight="200dp"
         android:background="@drawable/shape_operate_photo"
         android:clickable="true"
         android:gravity="center"
-        android:visibility="gone"
-        >
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_share"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="60dp"
+            android:layout_marginTop="10dp"
+            android:drawableTop="@drawable/share"
+            android:gravity="center"
+            android:text="分享"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tv_delete"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="100dp"
+            android:layout_centerInParent="true"
             android:layout_marginTop="10dp"
             android:drawableTop="@drawable/delete"
             android:gravity="center"
@@ -45,7 +55,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="100dp"
+            android:layout_marginRight="60dp"
             android:layout_marginTop="10dp"
             android:drawableTop="@drawable/selectall"
             android:gravity="center"

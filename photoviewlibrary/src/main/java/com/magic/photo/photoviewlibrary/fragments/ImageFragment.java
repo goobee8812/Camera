@@ -45,7 +45,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     private RecyclerView mRecyclerView;
     private GridLayoutManager mLayoutManager;
     private ImageAdapter mAdapter;
-//    private GridImageItemDecoration mItemDecoration;
+    //    private GridImageItemDecoration mItemDecoration;
     private RelativeLayout llSelect;
     private OnPhotoSelectChangeListener listener;
     private TextView tvShare;
@@ -66,7 +66,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_video_list_layout, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_image_list_layout, container, false);
         return rootView;
     }
 
@@ -78,14 +78,14 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
         tvDelete = (TextView) view.findViewById(R.id.tv_delete);
         tvAllselect = (TextView) view.findViewById(R.id.tv_allselect);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-//        mRecyclerView.addItemDecoration(mItemDecoration);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new ImageAdapter(_mActivity, count, listener);
-//        mItemDecoration.setAdapter(mAdapter);
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return mAdapter.getImageWraps().get(position).isTitle ? count : 1;
+                boolean isHeaderOrFooter = mAdapter.isFooterPosition(position);
+
+                return isHeaderOrFooter ? count : (mAdapter.getImageWraps().get(position).isTitle ? count : 1);
             }
         });
         OnRecyclerItemClickListener onRecyclerItemClickListener = new OnRecyclerItemClickListener(mRecyclerView);
@@ -112,6 +112,9 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     @Override
     public void onItemClick(RecyclerView.ViewHolder vh) {
         int position = vh.getAdapterPosition();
+        if (mAdapter.isFooterPosition(position)) {
+            return;
+        }
         if (!mAdapter.isTitle(position)) {
 
             if (mAdapter.getSelectState()) {
@@ -142,6 +145,9 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     @Override
     public void onItemLongClick(RecyclerView.ViewHolder vh) {
         int position = vh.getAdapterPosition();
+        if (mAdapter.isFooterPosition(position)) {
+            return;
+        }
         if (!mAdapter.isTitle(position)) {
             if (llSelect.getVisibility() == View.GONE) {
                 ((PhotoMainActivity) getActivity()).showPhotoSelect();
@@ -169,7 +175,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
         } else if (id == R.id.tv_delete) {
             createDeleteDialog();
         } else if (id == R.id.tv_allselect) {
-            mAdapter.allSelectPhotots();
+            mAdapter.allSelectPhotos();
         }
     }
 
@@ -186,7 +192,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     private void createDeleteDialog() {
 
         AlertDialog builder = new AlertDialog.Builder(getContext())
-                .setMessage(String.format("是否删除所选%s个文件", mAdapter.getSelectPhotot()))
+                .setMessage(String.format("是否删除所选%s个文件", mAdapter.getSelectPhoto()))
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -217,12 +223,12 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     }
 
 
-    public void noPhototSelect() {
+    public void noPhotoSelect() {
         tvShare.setAlpha(0.5f);
         tvShare.setClickable(false);
 
         tvDelete.setAlpha(0.5f);
-        tvShare.setClickable(false);
+        tvDelete.setClickable(false);
 
         tvAllselect.setText("全选");
     }
@@ -232,7 +238,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
         tvShare.setClickable(true);
 
         tvDelete.setAlpha(1.0f);
-        tvShare.setClickable(true);
+        tvDelete.setClickable(true);
 
         if (mAdapter.isAllPhotoSelect()) {
             tvAllselect.setText("取消全选");

@@ -26,17 +26,34 @@ public class VoicesWakeLock {
 
     private static PowerManager.WakeLock sCpuWakeLock;
 
-    public static void createPartialWakeLock(Context context) {
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        //sCpuWakeLock =pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK|PowerManager.ON_AFTER_RELEASE, "voices");
-        //pm.wakeUp(100);
+    private static VoicesWakeLock instance;
+    private  Context context;
 
-        sCpuWakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP| PowerManager.ON_AFTER_RELEASE | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "bright");
+    private VoicesWakeLock(Context context) {
+        this.context=context;
+        createPartialWakeLock(context);
+    }
+
+    public static VoicesWakeLock getInstance(Context context) {
+        if (instance == null) {
+            synchronized (VoicesWakeLock.class) {
+                if (instance == null) {
+                    instance = new VoicesWakeLock(context);
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void createPartialWakeLock(Context context) {
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+
+        sCpuWakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "bright");
 
         sCpuWakeLock.setReferenceCounted(false);
     }
 
-    public static void acquire(Context context) {
+    public void acquire() {
         if (sCpuWakeLock != null) {
             System.out.println("acquire 电源锁");
             sCpuWakeLock.acquire();
@@ -48,8 +65,7 @@ public class VoicesWakeLock {
     }
 
 
-
-    public static void releaseLock() {
+    public void releaseLock() {
         if (sCpuWakeLock != null) {
             System.out.println("释放电源锁");
             sCpuWakeLock.release();

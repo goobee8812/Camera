@@ -243,6 +243,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         initReceiver();
 
 
+
     }
 
     private void initReceiver() {

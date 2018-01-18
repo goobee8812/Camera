@@ -30,6 +30,7 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private static final String TAG = "VideoAdapter";
     private static final int IMAGE_TYPE = 0;
     private static final int TITLE_TYPE = 1;
+    private static final int BOTTOM_TYPE = 2;
     private int count;
     private boolean isEdit; //编辑模式的标志位；
     private List<ImageWrap> mImageWraps;
@@ -63,6 +64,9 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (viewType == IMAGE_TYPE) {
             rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_layout, parent, false);
             return new VideoViewHolder(rootView);
+        } else if (viewType == BOTTOM_TYPE) {
+            rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_footer_layout, parent, false);
+            return new FooterViewHolder(rootView);
         } else {
             rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_title_layout, parent, false);
             return new TitleViewHolder(rootView);
@@ -121,7 +125,7 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     }
 
-    public void allSelectPhotots() {
+    public void allSelectPhotos() {
         if (isAllPhotoSelect()) {
             selectList.clear();
             if (listener != null) {
@@ -211,7 +215,7 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    public int getSelectPhotot() {
+    public int getSelectPhoto() {
         return selectList.size();
     }
 
@@ -237,11 +241,14 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mImageWraps.size();
+        return mImageWraps.size() + 1;
     }
 
     @Override
     public int getItemViewType(int position) {
+        if (isFooterPosition(position)) {
+            return BOTTOM_TYPE;
+        }
         ImageWrap videoWrap = mImageWraps.get(position);
         if (videoWrap.isTitle) {
             return TITLE_TYPE;
@@ -267,12 +274,24 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+
+    public boolean isFooterPosition(int position) {
+        return position >= getItemCount() - 1;
+    }
+
     public static class TitleViewHolder extends RecyclerView.ViewHolder {
         public TextView mTitle;
 
         public TitleViewHolder(View itemView) {
             super(itemView);
             mTitle = (TextView) itemView.findViewById(R.id.textView_title);
+        }
+    }
+
+    public static class FooterViewHolder extends RecyclerView.ViewHolder {
+
+        public FooterViewHolder(View itemView) {
+            super(itemView);
         }
     }
 
