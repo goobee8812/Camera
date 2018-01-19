@@ -10,9 +10,8 @@ public class TimeUtil {
 
     @SuppressLint("DefaultLocale")
     public static String formatDuration(int duration) {
-        float sss = ((float) duration) / 1000;
-        System.out.println(sss);
-        duration = Math.round(sss);
+        float temp = ((float) duration) / 1000;
+        duration = Math.round(temp);
         int minute = duration / 60;
         int hour = minute / 60;
         minute %= 60;

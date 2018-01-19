@@ -1,9 +1,6 @@
 package com.cloudring.magic.camera.utils;
 
 import android.text.format.DateFormat;
-import android.view.View;
-
-import com.cloudring.magic.camera.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,24 +44,6 @@ public class TimeUtil {
             e.printStackTrace();
         }
         return date;
-    }
-
-//    public static String getMS(int secLength) {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(secLength);
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
-//        return simpleDateFormat.format(calendar.getTime());
-//    }
-
-
-    //控制背景白天黑夜
-    public static void dayAndNight(View view) {
-        int hoursTime = TimeUtil.getHours();
-        if (hoursTime > 18 || hoursTime < 6) {
-            view.setBackgroundResource(R.drawable.main_background_night);
-        } else {
-            view.setBackgroundResource(R.drawable.main_background_day);
-        }
     }
 
 }

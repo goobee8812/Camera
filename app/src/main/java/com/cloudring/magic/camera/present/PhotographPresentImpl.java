@@ -26,9 +26,9 @@ import java.util.TimerTask;
 
 
 public class PhotographPresentImpl implements PhotographPresent {
-    public static final String  TAG               = "PhotographPresentImpl";
-    public static       boolean takePhotoLock     = false;
-    public static       boolean isPhotoStopThread = false;
+    public static final String TAG = "PhotographPresentImpl";
+    public static boolean takePhotoLock = false;
+    public static boolean isPhotoStopThread = false;
 
 
     @Override
@@ -87,7 +87,7 @@ public class PhotographPresentImpl implements PhotographPresent {
     }
 
     @Override
-    public void takePhoto(Camera camera, final ZXPhotographActivity activity , final SaveCallback callback) {
+    public void takePhoto(Camera camera, final ZXPhotographActivity activity, final SaveCallback callback) {
 
         /**
          * 拍照实例
@@ -111,6 +111,7 @@ public class PhotographPresentImpl implements PhotographPresent {
                     callback.success(pictureName);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    camera.startPreview();
                     callback.onError(e);
                 }
             }
@@ -212,7 +213,7 @@ public class PhotographPresentImpl implements PhotographPresent {
                             });
                         }
                         if (time[0] == 0) {//如果现在已经达到了设定好的延迟时间
-                            takePhoto(camera, activity,callback);
+                            takePhoto(camera, activity, callback);
                             takePhotoLock = false;
                             timer.cancel();
                         }

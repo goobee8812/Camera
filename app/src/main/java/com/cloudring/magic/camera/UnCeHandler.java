@@ -46,13 +46,6 @@ public class UnCeHandler implements Thread.UncaughtExceptionHandler {
                     SpUtil.writeString("videoPath", "");
                 }
             }
-//            Intent intent = new Intent(application.getApplicationContext(), ZXPhotographActivity.class);
-//            @SuppressLint("WrongConstant") PendingIntent restartIntent = PendingIntent.getActivity(
-//                    application.getApplicationContext(), 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
-//            //退出程序
-//            AlarmManager mgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
-//            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
-//                    restartIntent); // 1秒钟后重启应用
             System.exit(0);
         }
     }
@@ -69,18 +62,8 @@ public class UnCeHandler implements Thread.UncaughtExceptionHandler {
             return false;
         }
 
-        System.out.println(".......");
         ex.printStackTrace();
-        //使用Toast来显示异常信息
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                Looper.prepare();
-//                Toast.makeText(application.getApplicationContext(), "很抱歉,程序出现异常,即将退出.",
-//                        Toast.LENGTH_SHORT).show();
-//                Looper.loop();
-//            }
-//        }.start();
+
         return true;
     }
 }

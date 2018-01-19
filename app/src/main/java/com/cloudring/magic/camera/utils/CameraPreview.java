@@ -38,15 +38,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             parameters.setPreviewFormat(ImageFormat.NV21);
             parameters.setFocusMode(Camera.Parameters.FLASH_MODE_AUTO);
 
-            List<Camera.Size> previewSizes = mCamera.getParameters()
-                    .getSupportedPreviewSizes();
+
             List<Camera.Size> pictureSizes = mCamera.getParameters()
                     .getSupportedPictureSizes();
 
-            for (int i = 0; i < previewSizes.size(); i++) {
-                Camera.Size psize = previewSizes.get(i);
 
-            }
             parameters.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 
             Camera.Size fs = null;
@@ -71,19 +67,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        if (mHolder.getSurface() == null) {
-            return;
-        }
-        try {
-            mCamera.stopPreview();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            mCamera.setPreviewDisplay(mHolder);
-            mCamera.startPreview();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 }

@@ -11,4 +11,11 @@
     <style name="AppTheme.Fullscreen.MagicLamp" parent="AppTheme">
     </style>
 
+
+    <style name="WelcomeStyle" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/transparent</item>
+    </style>
+
+
+
 </resources>
