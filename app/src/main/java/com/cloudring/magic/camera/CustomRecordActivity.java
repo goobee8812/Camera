@@ -9,6 +9,7 @@ import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -28,65 +29,97 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 
 public class CustomRecordActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "CustomRecordActivity";
     public static final int CONTROL_CODE = 1;
+    private static final String TAG = "CustomRecordActivity";
+
+
     //UI
     private ImageView mRecordControl;
-    private ImageView ivBack;
-    private ImageView ivCamera;
-    private SurfaceView surfaceView;
+    private ImageView     ivBack;
+    private ImageView     ivCamera;
+    private SurfaceView   surfaceView;
     private SurfaceHolder mSurfaceHolder;
-    private Chronometer mRecordTime;
-
+    private Chronometer   mRecordTime;
     //DATA
     private boolean isRecording;// 标记，判断当前是否正在录制
-    private boolean isPause; //暂停标识
     private long mPauseTime = 0;           //录制暂停时间间隔
-
     // 存储文件
     private File mVecordFile;
     private Camera mCamera;
     private MediaRecorder mediaRecorder;
     private String currentVideoFilePath;
-    private String saveVideoPath = "";
-
-
     private PhotographBroadCast photographBroadCast;
-    private IntentFilter filter;
-    private int width = 1280;
-    private int height = 720;
-
+    private int  width  = 1280;
+    private int  height = 720;
     private long mCurrentTime;
+    private SurfaceHolder.Callback mCallBack = new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceCreated(SurfaceHolder surfaceHolder) {
+            initCamera();
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+            if (mSurfaceHolder.getSurface() == null) {
+                return;
+            }
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+            stopCamera();
+        }
+    };
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom);
-        ActivityContainer.getInstance().addActivity(this);
         initView();
-
+        bindVoiceService();
     }
 
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(MyServiceConnection.getInstance().conn);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-//        iaudioState.mode(0);
         sendBroadcast(new Intent("com.android.Camera.stopvideo"));
-
         registerReceiver();
-
         initCamera();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(photographBroadCast);
+        if (isRecording) {
+            mRecordControl.setImageResource(R.mipmap.recordvideo_start);
+            stopRecord();
+            mCamera.lock();
+            delVideo();
+        }
+        stopCamera();
 
     }
+
+    private void bindVoiceService() {
+        Intent it = new Intent();
+        it.setPackage("com.cloudring.magic");
+        it.setAction("com.cloudring.voice.IRemoteService");
+        bindService(it, MyServiceConnection.getInstance().conn, BIND_AUTO_CREATE);
+    }
+
 
     private void initView() {
         surfaceView = (SurfaceView) findViewById(R.id.record_surfaceView);
@@ -111,28 +144,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-    private SurfaceHolder.Callback mCallBack = new SurfaceHolder.Callback() {
-        @Override
-        public void surfaceCreated(SurfaceHolder surfaceHolder) {
-            initCamera();
-        }
-
-        @Override
-        public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
-            if (mSurfaceHolder.getSurface() == null) {
-                return;
-            }
-        }
-
-        @Override
-        public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-            stopCamera();
-        }
-    };
-
-
     public void registerReceiver() {
-        filter = new IntentFilter();
+        IntentFilter filter = new IntentFilter();
         filter.addAction("com.android.Camera.takePhoto");
         filter.addAction("com.android.Camera.takePhotoFast");
         filter.addAction("com.android.Camera.closeCamera");
@@ -242,6 +255,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             mRecordTime.setVisibility(View.GONE);
             ivCamera.setVisibility(View.VISIBLE);
             isRecording = false;
+            mPauseTime = 0;
             System.out.println("stop");
             SpUtil.writeString("videoPath", "");
         }
@@ -263,34 +277,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         mRecordControl.setImageResource(R.mipmap.recordvideo_start);
                         stopRecord();
                         mCamera.lock();
-                        stopCamera();
-                        mRecordTime.stop();
-                        mPauseTime = 0;
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
 
-                                initCamera();
-//                                try {
-//                                    if (!(saveVideoPath.equals(""))) {
-//                                        String[] str = new String[]{saveVideoPath, currentVideoFilePath};
-//                                        VideoUtils.appendVideo(CustomRecordActivity.this, getSDPath(CustomRecordActivity.this) + "append.mp4", str);
-//                                        File reName = new File(saveVideoPath);
-//                                        File f = new File(getSDPath(CustomRecordActivity.this) + "append.mp4");
-//                                        //将合成的视频复制过来
-//                                        f.renameTo(reName);
-//                                        if (reName.exists()) {
-//                                            f.delete();
-//                                            new File(currentVideoFilePath).delete();
-//                                            MediaScannerConnection.scanFile(CustomRecordActivity.this, new String[]{currentVideoFilePath}, null, null);
-//                                        }
-//                                    }
-//
-//                                } catch (IOException e) {
-//                                    e.printStackTrace();
-//                                }
-                            }
-                        }).start();
                     }
                     MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
 
@@ -299,7 +286,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.ivBack:
                 if (back()) {
-                    ActivityContainer.getInstance().finishAllActivity();
+                    finish();
                 }
                 break;
             case R.id.ivCamera:
@@ -325,25 +312,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
-        ActivityContainer.getInstance().finishAllActivity();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-
-        unregisterReceiver(photographBroadCast);
-        if (isRecording) {
-            mRecordControl.setImageResource(R.mipmap.recordvideo_start);
-            stopRecord();
-            mCamera.lock();
-            stopCamera();
-            mRecordTime.stop();
-            mPauseTime = 0;
-            delVideo();
-        }
     }
 
     private void delVideo() {
@@ -437,58 +405,12 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         //mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
         // 设置视频录制的分辨率。必须放在设置编码和格式的后面，否则报错
         mediaRecorder.setVideoSize(width, height);
-        //mediarecorder.setVideoEncodingBitRate(bitRat);
-        // 设置录制的视频帧率。必须放在设置编码和格式的后面，否则报错
-//					if (fps != 0) {
-//						mediarecorder.setVideoFrameRate(fps);
-//					}
-        //mediarecorder.setOrientationHint(90);
         mediaRecorder.setPreviewDisplay(surfaceView.getHolder().getSurface());
         //        //设置录像视频保存地址
         currentVideoFilePath = getSDPath(getApplicationContext()) + getVideoName();
         mediaRecorder.setOutputFile(currentVideoFilePath);
         SpUtil.writeString("videoPath", currentVideoFilePath);
-//        mediaRecorder = new MediaRecorder();
-//        mediaRecorder.reset();
-//        mediaRecorder.setCamera(mCamera);
-//        mediaRecorder.setOnErrorListener(OnErrorListener);
-//
-//        //使用SurfaceView预览
-//        mediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
-//
-//        //1.设置采集声音
-//        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//        //设置采集图像
-//        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-//        //2.设置视频，音频的输出格式 mp4
-//        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-//        //3.设置音频的编码格式
-//        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-//        //设置图像的编码格式
-//        mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-//        //设置立体声
-//        //        mediaRecorder.setAudioChannels(2);
-//        //设置最大录像时间 单位：毫秒
-//        //        mediaRecorder.setMaxDuration(60 * 1000);
-//        //设置最大录制的大小 单位，字节
-//        //        mediaRecorder.setMaxFileSize(1024 * 1024);
-//        //音频一秒钟包含多少数据位
-//        CamcorderProfile mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
-//        mediaRecorder.setAudioEncodingBitRate(44100);
-//        if (mProfile.videoBitRate > 2 * 1024 * 1024) {
-//            mediaRecorder.setVideoEncodingBitRate(2 * 1024 * 1024);
-//        } else {
-//            mediaRecorder.setVideoEncodingBitRate(1024 * 1024);
-//        }
-//        mediaRecorder.setVideoFrameRate(mProfile.videoFrameRate);
-//
-//        //设置选择角度，顺时针方向，因为默认是逆向90度的，这样图像就是正常显示了,这里设置的是观看保存后的视频的角度
-//        mediaRecorder.setOrientationHint(0);
-//        //设置录像的分辨率
-//        mediaRecorder.setVideoSize(640, 480);
-//        //设置录像视频保存地址
-//        currentVideoFilePath = getSDPath(getApplicationContext()) + getVideoName();
-//        mediaRecorder.setOutputFile(currentVideoFilePath);
+
     }
 
     private String getVideoName() {
@@ -504,7 +426,17 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-
+    private String getRes() {
+        String[] res = {"蛋蛋还是先帮您打开相机吧!", "蛋蛋正在为您打开相机!"};
+        Random random = new Random();// 定义随机类
+        int ran = random.nextInt(2);
+        if (ran == 0) {
+            return res[0];
+        } else if (ran == 1) {
+            return res[1];
+        }
+        return res[1];
+    }
 
     public class PhotographBroadCast extends BroadcastReceiver {
         @Override
@@ -514,13 +446,27 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                 case "com.android.Camera.takePhotoFast"://直接拍照
                 case "com.android.Camera.takePhoto":
                     if (isRecording) {
+                        try {
+                            MyServiceConnection.getInstance().remoteService.speak("正在为您录像呢！");
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
                     } else {
+                        try {
+                            MyServiceConnection.getInstance().remoteService.speak(getRes());
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
                         ivCamera.performClick();
                     }
                     break;
 
                 case "com.android.Camera.startVideo"://启动录像广播
-
+//                    try {
+//                        MyServiceConnection.getInstance().remoteService.speak("好的,蛋蛋正在为您开启录像！");
+//                    } catch (RemoteException e) {
+//                        e.printStackTrace();
+//                    }
                     mRecordControl.performClick();
                     break;
 
@@ -530,7 +476,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                     break;
 
                 case "com.android.Camera.closeCamera"://按返回键
-                    ActivityContainer.getInstance().finishAllActivity();
+                    finish();
                     break;
                 default:
                     break;
@@ -539,10 +485,4 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        ActivityContainer.getInstance().removeActivity(this);
-    }
 }

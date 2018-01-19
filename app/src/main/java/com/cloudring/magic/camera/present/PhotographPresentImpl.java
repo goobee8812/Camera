@@ -26,9 +26,9 @@ import java.util.TimerTask;
 
 
 public class PhotographPresentImpl implements PhotographPresent {
-    public static final String TAG = "PhotographPresentImpl";
-    public static boolean takePhotoLock = false;
-    public static boolean isPhotoStopThread = false;
+    public static final String  TAG               = "PhotographPresentImpl";
+    public static       boolean takePhotoLock     = false;
+    public static       boolean isPhotoStopThread = false;
 
 
     @Override
@@ -87,91 +87,35 @@ public class PhotographPresentImpl implements PhotographPresent {
     }
 
     @Override
-    public void takePhoto(Camera camera, final ZXPhotographActivity activity) {
+    public void takePhoto(Camera camera, final ZXPhotographActivity activity , final SaveCallback callback) {
 
         /**
          * 拍照实例
          */
         final Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
             @Override
-            public void onPictureTaken(final byte[] data, Camera camera) {
-
+            public void onPictureTaken(final byte[] data, final Camera camera) {
                 final String pictureDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Camera";
-                if (pictureDir == null) {
-                    Log.d(TAG, "Error creating media file, check storage permissions!");
-                    return;
-                }
                 File f = new File(pictureDir);
                 if (!f.exists()) {
                     f.mkdir();
                 }
                 final String pictureName = pictureDir + File.separator + DateFormat.format("yyyyMMddHHmmss", new Date()).toString() + ".png";
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-//                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-//
-//                            final Bitmap modBm = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
-//
-//                            Canvas canvas = new Canvas(modBm);
-//
-//                            Paint paint = new Paint();
-//                            Matrix matrix = new Matrix();
-//                            matrix.setScale(-1, 1);//翻转
-//                            matrix.postTranslate(bitmap.getWidth(), 0);
-//
-//                            canvas.drawBitmap(bitmap, matrix, paint);
-
-                            FileOutputStream fos = new FileOutputStream(pictureName);
-//                            modBm.compress(Bitmap.CompressFormat.PNG, 90, fos);
-                            fos.write(data);
-                            fos.flush();
-                            fos.close();
-
-//                            // 把文件插入到系统图库
-//                            try {
-//                                MediaStore.Images.Media.insertImage(activity.getContentResolver(), pictureName, pictureName, null);
-//                            } catch (FileNotFoundException e) {
-//                                e.printStackTrace();
-//                            }
-//                            // 通知图库更新
-                            activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    activity.refreshPhotoOne();
-                                }
-                            });
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                            Log.d(TAG, "File not found: " + e.getMessage());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Log.d(TAG, "Error accessing file: " + e.getMessage());
-                        }
-                    }
-                }).start();
-                if (camera != null){
+                try {
+                    FileOutputStream fos = new FileOutputStream(pictureName);
+                    fos.write(data);
+                    fos.flush();
+                    fos.close();
                     camera.startPreview();//拍照完毕以后需要再次开启preview以保证拍照以后继续给surfaceView传递摄像数据
+                    // 通知图库更新
+                    callback.success(pictureName);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.onError(e);
                 }
             }
         };
-        if (camera != null) {
-            camera.autoFocus(new Camera.AutoFocusCallback() {
-
-                public void onAutoFocus(boolean success, Camera camera) {
-                    if (success) {
-                        camera.takePicture(null, null, mPictureCallback);
-                    }else{
-
-                    }
-                }
-            });
-
-        }
-
+        camera.takePicture(null, null, mPictureCallback);
     }
 
     @Override
@@ -248,7 +192,7 @@ public class PhotographPresentImpl implements PhotographPresent {
     }
 
     @Override
-    public void takePhotoDelay(final int delaySec, final Camera camera, final ZXPhotographActivity activity) {
+    public void takePhotoDelay(final int delaySec, final Camera camera, final ZXPhotographActivity activity, final SaveCallback callback) {
         final int[] time = {delaySec};
         final Timer timer = new Timer();
         ToastUtilKe.init(activity);
@@ -268,7 +212,7 @@ public class PhotographPresentImpl implements PhotographPresent {
                             });
                         }
                         if (time[0] == 0) {//如果现在已经达到了设定好的延迟时间
-                            takePhoto(camera, activity);
+                            takePhoto(camera, activity,callback);
                             takePhotoLock = false;
                             timer.cancel();
                         }

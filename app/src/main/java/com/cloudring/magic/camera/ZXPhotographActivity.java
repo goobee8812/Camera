@@ -1,7 +1,5 @@
 package com.cloudring.magic.camera;
 
-import android.Manifest;
-import android.app.Instrumentation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,16 +10,12 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -32,19 +26,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.cloudring.magic.camera.present.PhotographPresent;
 import com.cloudring.magic.camera.present.PhotographPresentImpl;
+import com.cloudring.magic.camera.present.SaveCallback;
 import com.cloudring.magic.camera.utils.CameraPreview;
 import com.cloudring.magic.camera.utils.PhotoEntity;
 import com.cloudring.magic.camera.utils.ScanPhoto;
 import com.magic.photo.photoviewlibrary.activity.PhotoMainActivity;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Date;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -53,17 +44,13 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto.LookUpPhotosCallback {
-    public static final int TAKE_PHOTO = 1;
-    public static final int CHOOSE_PHOTO = 2;
-    public static final int RECORDING = 3;
+public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto.LookUpPhotosCallback , SaveCallback{
     public static final String TAG = "ZXPhotographActivity";
-    boolean isDelay3 = false;
-    boolean isDelay6 = false;
-    @BindView(R.id.ivDelay)
-    ImageView ivDelay;
+
     @BindView(R.id.ivPhotoAlbum)
     public CircleImageView ivPhotoAlbum;
+    @BindView(R.id.ivDelay)
+    ImageView ivDelay;
     @BindView(R.id.llDelaySetting)
     LinearLayout flDelaySetting;
     @BindView(R.id.ivDelayClose)
@@ -87,68 +74,84 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     @BindColor(R.color.photo_delay_text_color_white)
     int delayColorWhite;
 
+    boolean isDelay3 = false;
+    boolean isDelay6 = false;
     private int count = 6;
     private Animation animation;   //动画
     private long mCurrentTime;
-
     private Camera mCamera;
     private CameraPreview mPreview;
     private FrameLayout mCameralayout;
     private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;//默认使用前置摄像头(咚咚机器人神坑,CAMERA_FACING_BACK明明应该是后置....d)
-    //    PhotographPresent photographPresent = new PhotographPresentImpl();
     private PhotographBroadCast photographBroadCast;
-    private IntentFilter filter;
-    private MediaPlayer mMediaPlayer;
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 3;
-    private boolean isTakePhoto;
+    private MediaPlayer  mMediaPlayer;
+
+    PhotographPresent photographPresent = new PhotographPresentImpl();
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+                if (count == 0) {
+                    return false;
+                }
+                int numNow = getCount();
+                if (numNow != 0) {
+                    teTimeDown.setText("" + numNow);
+                    handler.sendEmptyMessageDelayed(1, 1000);
+                    big();
+                }
+            return true;
+        }
+    });
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zxphotograph);
         ButterKnife.bind(this);
-
-
-        ActivityContainer.getInstance().addActivity(this);
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA,
-                            Manifest.permission.RECORD_AUDIO,
-                            Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PERMISSIONS_REQUEST_READ_CONTACTS);
-        }
-
+        bindVoiceService();
         initMediaPlayer();
-
     }
-
-
-
-
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_READ_CONTACTS: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    protected void onResume() {
+        super.onResume();
+        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(this);
+        initCamera();
+        refreshPhotoOne();
+        PhotographPresentImpl.isPhotoStopThread = false;
+        initReceiver();
+    }
 
-                } else {
-                    finish();
-                }
-                return;
-            }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(null);
+        releaseCamera();
+        PhotographPresentImpl.isPhotoStopThread = true;
+        handler.removeCallbacksAndMessages(null);
+        unRegisterReceiver();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releaseCamera();
+        PhotographPresentImpl.isPhotoStopThread = true;
+        handler.removeCallbacksAndMessages(null);
+        unbindService(MyServiceConnection.getInstance().conn);
+        MyServiceConnection.getInstance().remoteService = null;
+        if (mMediaPlayer != null) {
+            mMediaPlayer.stop();
+            mMediaPlayer.release();
         }
     }
 
+    private void bindVoiceService() {
+        Intent it = new Intent();
+        it.setPackage("com.cloudring.magic");
+        it.setAction("com.cloudring.voice.IRemoteService");
+        bindService(it, MyServiceConnection.getInstance().conn, BIND_AUTO_CREATE);
+    }
 
     @OnClick({R.id.ivDelay, R.id.ivPhotoAlbum, R.id.ivBack, R.id.ivTakingPictures, R.id.ivRecording, R.id.flDelayClose, R.id.flDelay3s, R.id.flDelay6S})
     public void onViewClicked(View view) {
@@ -165,29 +168,29 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                 releaseCamera();
                 break;
             case R.id.ivBack:
-                ActivityContainer.getInstance().finishAllActivity();
+                finish();
                 break;
             case R.id.ivTakingPictures:
-//                if (isDelay3) {
-//                    //延迟三秒
-//                    photographPresent.takePhotoDelay(3, mCamera, this);
-//                    PhotographPresentImpl.takePhotoLock = true;
-//                }
-//                if (isDelay6) {
-//                    //延迟六秒
-//                    photographPresent.takePhotoDelay(6, mCamera, this);
-//                    PhotographPresentImpl.takePhotoLock = true;
-//                }
-//                if (!isDelay3 && !isDelay6) {
-                //正常拍摄
-                if (System.currentTimeMillis() - mCurrentTime > 1000) {
-                    takePhoto(mCamera);
-                    mCurrentTime = System.currentTimeMillis();
+                if (isDelay3) {
+                    //延迟三秒
+                    photographPresent.takePhotoDelay(3, mCamera, this,this);
+                    PhotographPresentImpl.takePhotoLock = true;
                 }
-//                }
+                if (isDelay6) {
+                    //延迟六秒
+                    photographPresent.takePhotoDelay(6, mCamera, this,this);
+                    PhotographPresentImpl.takePhotoLock = true;
+                }
+                if (!isDelay3 && !isDelay6) {
+                    //正常拍摄
+                    if (System.currentTimeMillis() - mCurrentTime > 1000) {
+                        photographPresent.takePhoto(mCamera, this,this);
+                        mCurrentTime = System.currentTimeMillis();
+                    }
+                }
                 break;
             case R.id.ivRecording:
-                reCording();
+                photographPresent.reCording(this);
                 break;
             case R.id.flDelayClose:
                 ivDelayClose.setImageResource(R.mipmap.delay_close_red);
@@ -224,83 +227,32 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         }
     }
 
-    public void reCording() {
-        Intent intent = new Intent(this, CustomRecordActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        isTakePhoto = false;
-        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(this);
-        initCamera();
-        refreshPhotoOne();
-        PhotographPresentImpl.isPhotoStopThread = false;
-
-        initReceiver();
-
-    }
-
     private void initReceiver() {
-
+        registerReceiver();
         Intent intent = new Intent("com.android.OpenCamera");
         sendBroadcast(intent);
-
-        registerReceiver();
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(null);
-        releaseCamera();
-        PhotographPresentImpl.isPhotoStopThread = true;
-        handler.removeCallbacksAndMessages(null);
-
-        unRegisterReceiver();
     }
 
     private void unRegisterReceiver() {
         if (photographBroadCast != null) {
             unregisterReceiver(photographBroadCast);
         }
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
         Intent intent = new Intent("com.android.CloseCamera");
         sendBroadcast(intent);
-        System.out.println(".......");
-        releaseCamera();
-        PhotographPresentImpl.isPhotoStopThread = true;
-        handler.removeCallbacksAndMessages(null);
-
-        if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
-            mMediaPlayer = null;
-        }
-
     }
 
     public void refreshPhotoOne() {
-        handler.removeCallbacks(r);
-        handler.postDelayed(r, 300);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ScanPhoto.getInstance(ZXPhotographActivity.this).getPhotoFromLocalStorage();
+            }
+        }, 500);
     }
 
-    private Runnable r = new Runnable() {
-        @Override
-        public void run() {
-            ScanPhoto.getInstance(ZXPhotographActivity.this).getPhotoFromLocalStorage();
-        }
-    };
+    public void refreshPhoto(String photoPath){
+        Glide.with(ZXPhotographActivity.this).load(photoPath).into(ivPhotoAlbum);
+    }
 
     // 判断相机是否支持
     private boolean checkCameraHardware(Context context) {
@@ -315,8 +267,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
 
     public void initCamera() {
         if (!checkCameraHardware(this)) {
-            Toast.makeText(this, "相机不支持", Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, "相机不支持", Toast.LENGTH_SHORT).show();
         } else {
             openCamera();
         }
@@ -326,13 +277,9 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     public void openCamera() {
         if (mCamera == null) {
             mCamera = getCameraInstance();
-            //            mPreview = new CameraPreview(ZXPhotographActivity.this, mCamera);
-            //            mCameralayout = (FrameLayout) findViewById(R.id.camera_preview);
-            //            mCameralayout.addView(mPreview);
         }
 
         if (mPreview == null) {
-
             mPreview = new CameraPreview(ZXPhotographActivity.this, mCamera);
 
         }
@@ -354,23 +301,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         return c;
     }
 
-    /**
-     * 前后置摄像头转换
-     */
-    public void switchCamera() {
-        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        Camera.getCameraInfo(mCameraId, cameraInfo);
-        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-            mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
-        } else {
-            mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-        }
-        mCameralayout.removeView(mPreview);
-        releaseCamera();
-        openCamera();
-    }
-
-
     // 释放相机
     public void releaseCamera() {
         long lastTime = System.currentTimeMillis();
@@ -388,7 +318,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     }
 
     public void registerReceiver() {
-        filter = new IntentFilter();
+        IntentFilter filter = new IntentFilter();
         filter.addAction("com.android.Camera.takePhoto");
         filter.addAction("com.android.Camera.takePhotoFast");
         filter.addAction("com.android.Camera.closeCamera");
@@ -408,6 +338,17 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         Glide.with(ZXPhotographActivity.this).load(new File(photoArrayList.get(0).url)).into(ivPhotoAlbum);
     }
 
+    @Override
+    public void success(String photoPath) {
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + photoPath)));
+        refreshPhoto(photoPath);
+    }
+
+    @Override
+    public void onError(Exception e) {
+
+    }
+
 
     public class PhotographBroadCast extends BroadcastReceiver {
         @Override
@@ -423,14 +364,18 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     mMediaPlayer.start();
                     break;
                 case "com.android.Camera.closeCamera"://按返回键
-                    ActivityContainer.getInstance().finishAllActivity();
+                    finish();
                     break;
                 case "com.android.Camera.startVideo"://启动录像广播
                     //VoiceTTSManager.getInstance(CommonLib.getContext()).speak("好的,咚咚正在为您打开！");
                     ivRecording.performClick();
                     break;
                 case "com.android.Camera.stopVideo"://停止录像广播
-
+                    try {
+                        MyServiceConnection.getInstance().remoteService.speak("蛋蛋还是先帮您打开录像吧！");
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                     ivRecording.performClick();
                     break;
                 default:
@@ -438,60 +383,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             }
         }
     }
-
-    public void backRunnable() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Instrumentation inst = new Instrumentation();
-                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    private static class MyHandler extends Handler {
-        private final WeakReference<ZXPhotographActivity> mActivity;
-
-        public MyHandler(ZXPhotographActivity activity) {
-            mActivity = new WeakReference<ZXPhotographActivity>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-
-            if (mActivity.get() == null) {
-                return;
-            }
-
-            if (mActivity.get().count == 0) {
-                return;
-            }
-            int numNow = mActivity.get().getCount();
-            if (numNow != 0) {
-                mActivity.get().teTimeDown.setText("" + numNow);
-                mActivity.get().big();
-            }
-        }
-    }
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            if (count == 0) {
-                return;
-            }
-            int numNow = getCount();
-            if (numNow != 0) {
-                teTimeDown.setText("" + numNow);
-                big();
-            }
-
-        }
-    };
 
     private int getCount() {
         count--;
@@ -528,7 +419,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                 if (animation != null) {     //animation为null此时是直接进入相机进行拍照
                     animation.cancel();
                     //开始照相
-                    takePhoto(mCamera);
+                    photographPresent.takePhoto(mCamera, ZXPhotographActivity.this,ZXPhotographActivity.this);
                 }
 
 
@@ -537,96 +428,18 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     }
 
     public void big() {
-        try {
-            animation.reset();
-            teTimeDown.startAnimation(animation);
-            handler.sendEmptyMessageDelayed(1, 1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-            teTimeDown.setVisibility(View.GONE);
-            mMediaPlayer.start();
-        }
+        animation.reset();
+        teTimeDown.startAnimation(animation);
     }
 
     private void wantTakePic() {
-        try {
-            count = 2;
-            teTimeDown.setText("准备");
-            teTimeDown.setVisibility(View.VISIBLE);
-            animation = AnimationUtils.loadAnimation(ZXPhotographActivity.this, R.anim.animation_text);
-            teTimeDown.startAnimation(animation);
-            handler.sendEmptyMessageDelayed(1, 1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-            teTimeDown.setVisibility(View.GONE);
-            mMediaPlayer.start();
-        }
-
+        count = 2;
+        teTimeDown.setText("准备");
+        teTimeDown.setVisibility(View.VISIBLE);
+        animation = AnimationUtils.loadAnimation(ZXPhotographActivity.this, R.anim.animation_text);
+        teTimeDown.startAnimation(animation);
+        handler.sendEmptyMessageDelayed(1, 1000);
     }
-
-
-    public void takePhoto(Camera camera) {
-        if (isTakePhoto) {
-            return;
-        }
-        isTakePhoto = true;
-        /**
-         * 拍照实例
-         */
-        if (camera != null) {
-            camera.takePicture(null, null, mPictureCallback);
-        }
-
-
-    }
-
-    private Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
-        @Override
-        public void onPictureTaken(final byte[] data, Camera camera) {
-
-            final String pictureDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Camera";
-            if (pictureDir == null) {
-                Log.d(TAG, "Error creating media file, check storage permissions!");
-                return;
-            }
-            File f = new File(pictureDir);
-            if (!f.exists()) {
-                f.mkdir();
-            }
-            final String pictureName = pictureDir + File.separator + DateFormat.format("yyyyMMddHHmmss", new Date()).toString() + ".png";
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        FileOutputStream fos = new FileOutputStream(pictureName);
-                        fos.write(data);
-                        fos.flush();
-                        fos.close();
-                        // 通知图库更新
-                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pictureName)));
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshPhotoOne();
-                            }
-                        });
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "File not found: " + e.getMessage());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "Error accessing file: " + e.getMessage());
-                    }
-
-                }
-            }).start();
-            if (camera != null) {
-                camera.startPreview();//拍照完毕以后需要再次开启preview以保证拍照以后继续给surfaceView传递摄像数据
-            }
-            isTakePhoto = false;
-        }
-    };
 
 
 }

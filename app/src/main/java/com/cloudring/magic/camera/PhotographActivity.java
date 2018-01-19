@@ -19,8 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -94,24 +92,17 @@ public class PhotographActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_photograph);
         ButterKnife.bind(this);
-        //        注册广播
+        //注册广播
         registerReceiver();
         initMediaPlayer();
-
         getFamilyData(getIntent());
-
     }
 
     private void getFamilyData(Intent intent) {
         tinyid = intent.getLongExtra("tinyid", 1);
         familyName = intent.getStringExtra("familyName");
-        //        intent.putExtra("tinyid",tinyid);
-        //        intent.putExtra("name",familyName);
     }
 
     @OnClick({R.id.ivDelay, R.id.ivPhotoAlbum, R.id.ivBack, R.id.ivTakingPictures, R.id.ivRecording, R.id.flDelayClose, R.id.flDelay3s, R.id.flDelay6S})
@@ -188,7 +179,6 @@ public class PhotographActivity extends AppCompatActivity {
         initCamera();
         refreshPhotoOne(ivPhotoAlbum);
         PhotographPresentImpl.isPhotoStopThread = false;
-        //        CameraRecognize.getInstance(this).create();
         isTakePhoto = true;
     }
 

@@ -20,7 +20,6 @@ public class MyApp extends Application {
         context = this;
         CrashReport.initCrashReport(getApplicationContext(), "d5ce68976c", true);
 
-
         //设置该CrashHandler为程序的默认处理器
         UnCeHandler catchExcep = new UnCeHandler(this);
         Thread.setDefaultUncaughtExceptionHandler(catchExcep);
