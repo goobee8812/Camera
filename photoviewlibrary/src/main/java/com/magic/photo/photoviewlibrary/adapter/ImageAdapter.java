@@ -158,8 +158,31 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return list;
     }
 
+
+    private List sortList(List list, String operation) {
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < list.size() - i - 1; j++) {
+                int a = Integer.parseInt(list.get(j).toString());
+                int b = Integer.parseInt(list.get(j + 1).toString());
+                if (">".equals(operation)) {
+                    if (a > b) {
+                        list.set(j, b);
+                        list.set(j + 1, a);
+                    }
+                } else {
+                    if (a < b) {
+                        list.set(j, b);
+                        list.set(j + 1, a);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
     public void delectPhotos() {
         List<Integer> list = new ArrayList<>();
+
         for (int position : selectList) {
             System.out.println(position);
             if (position >= mImageWraps.size()) {
@@ -171,7 +194,7 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 list.add(position);
             }
         }
-
+        list = sortList(list, ">");
         for (int i = list.size() - 1; i >= 0; i--) {
             int position = list.get(i);
             if (position >= mImageWraps.size()) {
@@ -191,6 +214,7 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 continue;
             }
         }
+        list = sortList(list, ">");
         for (int i = list.size() - 1; i >= 0; i--) {
             int position = list.get(i);
             if (position >= mImageWraps.size()) {

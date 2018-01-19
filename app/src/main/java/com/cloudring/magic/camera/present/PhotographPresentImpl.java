@@ -153,17 +153,19 @@ public class PhotographPresentImpl implements PhotographPresent {
                         }
                     }
                 }).start();
-                if (camera != null)
+                if (camera != null){
                     camera.startPreview();//拍照完毕以后需要再次开启preview以保证拍照以后继续给surfaceView传递摄像数据
+                }
             }
         };
         if (camera != null) {
             camera.autoFocus(new Camera.AutoFocusCallback() {
 
                 public void onAutoFocus(boolean success, Camera camera) {
-                    // TODO Auto-generated method stub
                     if (success) {
                         camera.takePicture(null, null, mPictureCallback);
+                    }else{
+
                     }
                 }
             });

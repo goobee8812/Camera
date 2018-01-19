@@ -147,6 +147,28 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     }
 
+    private List sortList(List list, String operation) {
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < list.size() - i - 1; j++) {
+                int a = Integer.parseInt(list.get(j).toString());
+                int b = Integer.parseInt(list.get(j + 1).toString());
+                if (">".equals(operation)) {
+                    if (a > b) {
+                        list.set(j, b);
+                        list.set(j + 1, a);
+                    }
+                } else {
+                    if (a < b) {
+                        list.set(j, b);
+                        list.set(j + 1, a);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+
 
     public void delectVideos() {
         List<Integer> list = new ArrayList<>();
@@ -162,6 +184,7 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         }
 
+        list = sortList(list, ">");
         for (int i = list.size() - 1; i >= 0; i--) {
             int position = list.get(i);
             if (position >= mVideoWraps.size()) {
@@ -181,6 +204,7 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 continue;
             }
         }
+        list = sortList(list, ">");
         for (int i = list.size() - 1; i >= 0; i--) {
             int position = list.get(i);
             if (position >= mVideoWraps.size()) {

@@ -10,7 +10,6 @@ import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.RemoteException;
 import android.os.SystemClock;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -27,7 +26,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 public class VideoMessageActivity extends Activity implements OnClickListener, SurfaceHolder.Callback {
 
@@ -300,17 +298,7 @@ public class VideoMessageActivity extends Activity implements OnClickListener, S
         }).start();
     }
 
-    private String getRes() {
-        String[] res = {"蛋蛋还是先帮您打开相机吧!", "蛋蛋正在为您打开相机!"};
-        Random random = new Random();// 定义随机类
-        int ran = random.nextInt(2);
-        if (ran == 0) {
-            return res[0];
-        } else if (ran == 1) {
-            return res[1];
-        }
-        return res[1];
-    }
+
 
     public class PhotographBroadCast extends BroadcastReceiver {
         @Override
@@ -320,27 +308,14 @@ public class VideoMessageActivity extends Activity implements OnClickListener, S
                 case "com.android.Camera.takePhotoFast"://直接拍照
                 case "com.android.Camera.takePhoto":
                     if (isRecording) {
-                        try {
-                            MyServiceConnection.getInstance().remoteService.speak("正在为您录像呢！");
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
+
                     } else {
-                        try {
-                            MyServiceConnection.getInstance().remoteService.speak(getRes());
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
                         ivCamera.performClick();
                     }
                     break;
 
                 case "com.android.Camera.startVideo"://启动录像广播
-//                    try {
-//                        MyServiceConnection.getInstance().remoteService.speak("好的,蛋蛋正在为您开启录像！");
-//                    } catch (RemoteException e) {
-//                        e.printStackTrace();
-//                    }
+
                     mRecordControl.performClick();
                     break;
 

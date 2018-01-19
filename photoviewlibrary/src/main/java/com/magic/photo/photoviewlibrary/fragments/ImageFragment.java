@@ -116,7 +116,6 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
             return;
         }
         if (!mAdapter.isTitle(position)) {
-
             if (mAdapter.getSelectState()) {
                 if (mAdapter.isSelectThePhoto(position)) {
                     mAdapter.removeSelectPhoto(position);

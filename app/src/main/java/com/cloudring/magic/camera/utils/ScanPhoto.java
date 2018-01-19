@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -80,6 +81,9 @@ public class ScanPhoto {
             for (int i = 0; i < size; i++) {//遍历全部图片
                 mCursor.moveToPosition(i);
                 String path = mCursor.getString(0);// 获取图片的路径
+                if (!new File(path).exists() || (path.contains("wyt") && path.contains("flash"))) {
+                    continue;
+                }
                 String dataTime = pictureSortTime(path);//将所有图片的时间数据放到整型数组里
                 PhotoEntity entity = new PhotoEntity();
                 entity.url = path;//将图片的uri放到对象里去
