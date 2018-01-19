@@ -443,7 +443,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                     break;
 
                 case "com.android.Camera.startVideo"://启动录像广播
-
                     mRecordControl.performClick();
                     break;
 
@@ -451,7 +450,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                     mRecordControl.performClick();
                     break;
                 case "com.android.Camera.closeCamera"://按返回键
-                    finish();
+                    setToResult();
                     break;
                 default:
                     break;

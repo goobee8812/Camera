@@ -111,9 +111,9 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
 
         requestCameraPermissions();
 
-        boolean isStartRecord = getIntent().getBooleanExtra("", false);
+        boolean openRecord = getIntent().getBooleanExtra("open_record", false);
 
-        if (isStartRecord){
+        if (openRecord){
             startRecord();
         }
 
@@ -293,6 +293,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     }
 
     public void refreshPhoto(String photoPath) {
+        ivPhotoAlbum.setVisibility(View.VISIBLE);
         Glide.with(ZXPhotographActivity.this).load(photoPath).into(ivPhotoAlbum);
     }
 
