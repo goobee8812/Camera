@@ -437,6 +437,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                 case "com.android.Camera.takePhotoFast"://直接拍照
                 case "com.android.Camera.takePhoto":
                     if (isRecording) {
+
                     } else {
                         ivCamera.performClick();
                     }
