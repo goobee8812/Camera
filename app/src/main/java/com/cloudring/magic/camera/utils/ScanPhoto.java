@@ -26,6 +26,9 @@ public class ScanPhoto {
     private static ScanPhoto instance;
     private Context context;
     private ScanPhoto.LookUpPhotosCallback completeCallback;
+    private String SELECTOR_IMAGE = MediaStore.Images.Media.MIME_TYPE + "=? or "
+            + MediaStore.Images.Media.MIME_TYPE + "=? or "
+            + MediaStore.Images.Media.MIME_TYPE + "=?";
 
     private ScanPhoto(Context context) {
         this.context = context;
@@ -71,7 +74,7 @@ public class ScanPhoto {
 //                Log.i("Alex", "准备查找图片");
             // 只查询jpeg和png的图片
             Cursor mCursor = mContentResolver.query(mImageUri, new String[]{MediaStore.Images.Media.DATA},
-                    MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?", new String[]{"image/jpeg", "image/png"}, sortOrder + getSize);
+                    SELECTOR_IMAGE, new String[]{"image/jpeg", "image/png"}, sortOrder);
             if (mCursor == null) return allPhotoArrayList;
             int size = mCursor.getCount();
 //                Log.i("Alex", "查到的size是" + size);
@@ -81,9 +84,10 @@ public class ScanPhoto {
             for (int i = 0; i < size; i++) {//遍历全部图片
                 mCursor.moveToPosition(i);
                 String path = mCursor.getString(0);// 获取图片的路径
-                if (!new File(path).exists() || (path.contains("wyt") && path.contains("flash"))) {
+                if (!new File(path).exists() || (path.contains("wyt") && path.contains("flash")) || path.contains("huiben")) {
                     continue;
                 }
+                System.out.println(path);
                 String dataTime = pictureSortTime(path);//将所有图片的时间数据放到整型数组里
                 PhotoEntity entity = new PhotoEntity();
                 entity.url = path;//将图片的uri放到对象里去

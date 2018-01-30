@@ -1,6 +1,7 @@
 package com.cloudring.magic.camera;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -30,6 +31,8 @@ public class UnCeHandler implements Thread.UncaughtExceptionHandler {
             //如果用户没有处理则让系统默认的异常处理器来处理
             mDefaultHandler.uncaughtException(thread, ex);
         } else {
+            Intent intent = new Intent("com.android.CloseCamera");
+            context.sendBroadcast(intent);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

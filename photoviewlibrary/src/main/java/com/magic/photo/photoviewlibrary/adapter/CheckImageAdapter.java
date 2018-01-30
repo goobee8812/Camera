@@ -5,8 +5,8 @@ import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
-import com.bm.library.PhotoView;
 import com.bumptech.glide.Glide;
 import com.magic.photo.photoviewlibrary.R;
 import com.magic.photo.photoviewlibrary.entity.Image;
@@ -35,8 +35,8 @@ public class CheckImageAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
         View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_check_image, null);
-        PhotoView photoView = (PhotoView) rootView.findViewById(R.id.photo_view);
-        photoView.enable();
+        ImageView photoView = (ImageView) rootView.findViewById(R.id.photo_view);
+//        photoView.enable();
         String path = mList.get(position).path;
         if (path != null && new File(path).exists()) {
             Glide.with(mContext).load(path).into(photoView);
