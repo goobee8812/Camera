@@ -48,7 +48,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     //    private GridImageItemDecoration mItemDecoration;
     private RelativeLayout llSelect;
     private OnPhotoSelectChangeListener listener;
-    private TextView tvShare;
+    //    private TextView tvShare;
     private TextView tvDelete;
     private TextView tvAllselect;
 
@@ -74,7 +74,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         llSelect = (RelativeLayout) view.findViewById(R.id.ll_select);
-        tvShare = (TextView) view.findViewById(R.id.tv_share);
+//        tvShare = (TextView) view.findViewById(R.id.tv_share);
         tvDelete = (TextView) view.findViewById(R.id.tv_delete);
         tvAllselect = (TextView) view.findViewById(R.id.tv_allselect);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
@@ -93,7 +93,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
         onRecyclerItemClickListener.setOnItemClickListener(this);
         onRecyclerItemClickListener.setOnItemLongClickListener(this);
         mRecyclerView.setAdapter(mAdapter);
-        tvShare.setOnClickListener(this);
+//        tvShare.setOnClickListener(this);
         tvDelete.setOnClickListener(this);
         tvAllselect.setOnClickListener(this);
     }
@@ -168,10 +168,11 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.tv_share) {
-            List<String> selectImagePath = mAdapter.getSelectImagePath();
-            showShare(selectImagePath);
-        } else if (id == R.id.tv_delete) {
+//        if (id == R.id.tv_share) {
+//            List<String> selectImagePath = mAdapter.getSelectImagePath();
+//            showShare(selectImagePath);
+//        }
+        if (id == R.id.tv_delete) {
             createDeleteDialog();
         } else if (id == R.id.tv_allselect) {
             mAdapter.allSelectPhotos();
@@ -223,8 +224,8 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
 
 
     public void noPhotoSelect() {
-        tvShare.setAlpha(0.5f);
-        tvShare.setClickable(false);
+//        tvShare.setAlpha(0.5f);
+//        tvShare.setClickable(false);
 
         tvDelete.setAlpha(0.5f);
         tvDelete.setClickable(false);
@@ -233,8 +234,8 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
     }
 
     public void photoSelect() {
-        tvShare.setAlpha(1.0f);
-        tvShare.setClickable(true);
+//        tvShare.setAlpha(1.0f);
+//        tvShare.setClickable(true);
 
         tvDelete.setAlpha(1.0f);
         tvDelete.setClickable(true);

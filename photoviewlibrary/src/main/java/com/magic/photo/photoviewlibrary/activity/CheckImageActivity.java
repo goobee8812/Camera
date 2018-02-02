@@ -33,7 +33,7 @@ public class CheckImageActivity extends SupportActivity implements View.OnClickL
     private FrameLayout mTopLayout;
     private ImageView mBack;
     private ImageView mDelete;
-    private ImageView mShare;
+    //    private ImageView mShare;
     private ViewPager mPager;
     private Dialog mDialogDelete;
     private int mPosition;
@@ -54,7 +54,7 @@ public class CheckImageActivity extends SupportActivity implements View.OnClickL
     private void initListener() {
         mBack.setOnClickListener(this);
         mDelete.setOnClickListener(this);
-        mShare.setOnClickListener(this);
+//        mShare.setOnClickListener(this);
         mAdapter.setOnItemClickListener(this);
     }
 
@@ -101,7 +101,7 @@ public class CheckImageActivity extends SupportActivity implements View.OnClickL
     private void initView() {
         mTopLayout = (FrameLayout) findViewById(R.id.framelayout_top);
         mBack = (ImageView) findViewById(R.id.imageView_back);
-        mShare = (ImageView) findViewById(R.id.imageView_share);
+//        mShare = (ImageView) findViewById(R.id.imageView_share);
         mDelete = (ImageView) findViewById(R.id.imageView_delete);
         mPager = (ViewPager) findViewById(R.id.viewpager);
     }
@@ -160,6 +160,7 @@ public class CheckImageActivity extends SupportActivity implements View.OnClickL
 
     @Override
     public void onItemClick(View view, int position) {
+        mTopLayout.setVisibility(View.VISIBLE);
         if (!isShow) {
             showController();
         } else {
