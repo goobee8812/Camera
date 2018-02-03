@@ -22,23 +22,23 @@ import android.os.PowerManager;
 /**
  * Utility class to hold wake lock in app.
  */
-public class VoicesWakeLock {
+public class PowerWakeLock {
 
     private static PowerManager.WakeLock sCpuWakeLock;
 
-    private static VoicesWakeLock instance;
+    private static PowerWakeLock instance;
     private  Context context;
 
-    private VoicesWakeLock(Context context) {
+    private PowerWakeLock(Context context) {
         this.context=context;
         createPartialWakeLock(context);
     }
 
-    public static VoicesWakeLock getInstance(Context context) {
+    public static PowerWakeLock getInstance(Context context) {
         if (instance == null) {
-            synchronized (VoicesWakeLock.class) {
+            synchronized (PowerWakeLock.class) {
                 if (instance == null) {
-                    instance = new VoicesWakeLock(context);
+                    instance = new PowerWakeLock(context);
                 }
             }
         }

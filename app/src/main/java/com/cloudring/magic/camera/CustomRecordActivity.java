@@ -9,6 +9,7 @@ import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.cloudring.magic.camera.utils.PowerWakeLock;
 import com.cloudring.magic.camera.utils.SpUtil;
 
 import java.io.File;
@@ -54,6 +56,9 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private int width = 1280;
     private int height = 720;
     private long mCurrentTime;
+    private Handler handler = new Handler();
+    private int releaseLockTime = 2 * 60 * 1000;
+    private boolean isReleaseLock;
     private SurfaceHolder.Callback mCallBack = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
@@ -94,11 +99,23 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         sendBroadcast(new Intent("com.android.Camera.stopvideo"));
         registerReceiver();
         initCamera();
+
+        isReleaseLock = true;
+        resetLock();
     }
+
+    private Runnable releaseLock = new Runnable() {
+        @Override
+        public void run() {
+            PowerWakeLock.getInstance(CustomRecordActivity.this).releaseLock();
+            isReleaseLock=true;
+        }
+    };
 
     @Override
     protected void onPause() {
         super.onPause();
+        handler.removeCallbacks(releaseLock);
         unregisterReceiver(photographBroadCast);
         if (isRecording) {
             mRecordControl.setImageResource(R.mipmap.recordvideo_start);
@@ -107,6 +124,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             delVideo();
         }
         stopCamera();
+
+        PowerWakeLock.getInstance(this).releaseLock();
     }
 
 
@@ -142,6 +161,15 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         filter.addAction("com.android.Camera.stopVideo");
         photographBroadCast = new PhotographBroadCast();
         registerReceiver(photographBroadCast, filter);
+    }
+
+    private void resetLock() {
+        if (isReleaseLock) {
+            PowerWakeLock.getInstance(this).acquire();
+            isReleaseLock = false;
+        }
+        handler.removeCallbacks(releaseLock);
+        handler.postDelayed(releaseLock, releaseLockTime);
     }
 
 
@@ -200,6 +228,13 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
 
     public void startRecord() {
+        handler.removeCallbacks(releaseLock);
+        if (isReleaseLock) {
+            PowerWakeLock.getInstance(CustomRecordActivity.this).acquire();
+            isReleaseLock = false;
+        }
+
+
         sendBroadcast(new Intent("com.android.Camera.startvideo"));
         initCamera();
         mCamera.unlock();
@@ -227,6 +262,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
      * 停止录制视频
      */
     public void stopRecord() {
+        handler.postDelayed(releaseLock, releaseLockTime);
         sendBroadcast(new Intent("com.android.Camera.stopvideo"));
         if (isRecording && mediaRecorder != null) {
             // 设置后不会崩

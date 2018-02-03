@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.cloudring.magic.camera.utils.PowerWakeLock;
 import com.cloudring.magic.camera.utils.SpUtil;
 
 import java.io.File;
@@ -33,6 +34,7 @@ public class UnCeHandler implements Thread.UncaughtExceptionHandler {
         } else {
             Intent intent = new Intent("com.android.CloseCamera");
             context.sendBroadcast(intent);
+            PowerWakeLock.getInstance(context).releaseLock();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

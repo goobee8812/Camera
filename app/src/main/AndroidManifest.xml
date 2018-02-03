@@ -33,6 +33,7 @@
         <activity
             android:name=".ZXPhotographActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
@@ -44,6 +45,7 @@
         <activity
             android:name=".CustomRecordActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 

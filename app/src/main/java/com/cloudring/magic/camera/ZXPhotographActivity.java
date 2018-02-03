@@ -33,6 +33,7 @@ import com.cloudring.magic.camera.present.PhotographPresentImpl;
 import com.cloudring.magic.camera.present.SaveCallback;
 import com.cloudring.magic.camera.utils.CameraPreview;
 import com.cloudring.magic.camera.utils.PhotoEntity;
+import com.cloudring.magic.camera.utils.PowerWakeLock;
 import com.cloudring.magic.camera.utils.ScanPhoto;
 import com.magic.photo.photoviewlibrary.activity.PhotoMainActivity;
 
@@ -88,6 +89,8 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;//默认使用前置摄像头(咚咚机器人神坑,CAMERA_FACING_BACK明明应该是后置....d)
     private PhotographBroadCast photographBroadCast;
     private MediaPlayer mMediaPlayer;
+    private int releaseLockTime = 2 * 60 * 1000;
+    private boolean isReleaseLock;
     PhotographPresent photographPresent = new PhotographPresentImpl();
     Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -104,6 +107,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         }
     });
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,9 +115,10 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
 
         requestCameraPermissions();
 
+
         boolean openRecord = getIntent().getBooleanExtra("open_record", false);
 
-        if (openRecord){
+        if (openRecord) {
             startRecord();
         }
 
@@ -146,7 +151,20 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         refreshPhotoOne();
         PhotographPresentImpl.isPhotoStopThread = false;
         initReceiver();
+
+        isReleaseLock=true;
+        resetLock();
+
     }
+
+
+    private Runnable releaseLock = new Runnable() {
+        @Override
+        public void run() {
+            PowerWakeLock.getInstance(ZXPhotographActivity.this).releaseLock();
+            isReleaseLock = true;
+        }
+    };
 
     @Override
     protected void onPause() {
@@ -224,6 +242,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     if (System.currentTimeMillis() - mCurrentTime > 1000) {
                         photographPresent.takePhoto(mCamera, this, this);
                         mCurrentTime = System.currentTimeMillis();
+                        resetLock();
                     }
                 }
                 break;
@@ -469,11 +488,23 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     animation.cancel();
                     //开始照相
                     photographPresent.takePhoto(mCamera, ZXPhotographActivity.this, ZXPhotographActivity.this);
+
+                    resetLock();
+
                 }
 
 
             }
         });
+    }
+
+    private void resetLock() {
+        if (isReleaseLock) {
+            PowerWakeLock.getInstance(this).acquire();
+            isReleaseLock = false;
+        }
+        handler.removeCallbacks(releaseLock);
+        handler.postDelayed(releaseLock, releaseLockTime);
     }
 
     public void big() {

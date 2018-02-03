@@ -62,7 +62,7 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View rootView;
         if (viewType == IMAGE_TYPE) {
-            rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_layout, parent, false);
+            rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image_layout, parent, false);
             return new VideoViewHolder(rootView);
         } else if (viewType == BOTTOM_TYPE) {
             rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_footer_layout, parent, false);
