@@ -72,9 +72,17 @@ public class ScanPhoto {
             ContentResolver mContentResolver = context.getContentResolver();//得到内容处理者实例
             String sortOrder = MediaStore.Images.Media.DATE_ADDED + " desc";//设置拍摄日期为倒序
 //                Log.i("Alex", "准备查找图片");
+
+            //selection: 指定查询条件
+            String selection = MediaStore.Images.Media.DATA + " like ?";
+            //设定查询目录
+            String cameraPath = "/storage/emulated/0/Camera";
+            //定义selectionArgs：
+            String[] selectionArgs = {cameraPath + "%"};
+
             // 只查询jpeg和png的图片
             Cursor mCursor = mContentResolver.query(mImageUri, new String[]{MediaStore.Images.Media.DATA},
-                    SELECTOR_IMAGE, new String[]{"image/jpeg", "image/png"}, sortOrder);
+                    selection, selectionArgs, sortOrder);
             if (mCursor == null) return allPhotoArrayList;
             int size = mCursor.getCount();
 //                Log.i("Alex", "查到的size是" + size);

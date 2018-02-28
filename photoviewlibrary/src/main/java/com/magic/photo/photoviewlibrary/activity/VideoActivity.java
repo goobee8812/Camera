@@ -67,7 +67,7 @@ public class VideoActivity extends AppCompatActivity implements CustomVideoView.
 
     private void initData() {
         mVideo = (Video) getIntent().getSerializableExtra(KEY_DATA);
-        mVideos = FileManager.getInstance().getVideosFromMedia(this);
+        mVideos = FileManager.getInstance().getVideosFromCamera(this);
         for (int i = 0; i < mVideos.size(); i++) {
             Video video = mVideos.get(i);
             if (video.id == mVideo.id) {

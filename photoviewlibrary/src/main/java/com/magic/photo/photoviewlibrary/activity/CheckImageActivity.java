@@ -66,7 +66,7 @@ public class CheckImageActivity extends SupportActivity implements View.OnClickL
 
     private void initData() {
         long id = getIntent().getLongExtra(KEY_DATA, 0);
-        mImages = FileManager.getInstance().getImageFormMedia(this);
+        mImages = FileManager.getInstance().getImageFormCamera(this);
         Log.d(TAG, "initData: " + mImages.toString());
         for (int i = 0; i < mImages.size(); i++) {
             Image image = mImages.get(i);

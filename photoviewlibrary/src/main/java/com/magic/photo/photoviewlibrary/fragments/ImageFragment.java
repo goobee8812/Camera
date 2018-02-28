@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -88,6 +89,7 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
                 return isHeaderOrFooter ? count : (mAdapter.getImageWraps().get(position).isTitle ? count : 1);
             }
         });
+        ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         OnRecyclerItemClickListener onRecyclerItemClickListener = new OnRecyclerItemClickListener(mRecyclerView);
         mRecyclerView.addOnItemTouchListener(onRecyclerItemClickListener);
         onRecyclerItemClickListener.setOnItemClickListener(this);
@@ -96,17 +98,18 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
 //        tvShare.setOnClickListener(this);
         tvDelete.setOnClickListener(this);
         tvAllselect.setOnClickListener(this);
+        initData();
     }
 
     private void initData() {
-        List<Image> images = FileManager.getInstance().getImageFormMedia(_mActivity);
+        List<Image> images = FileManager.getInstance().getImageFormCamera(_mActivity);
         mAdapter.setImages(images);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        initData();
+
     }
 
     @Override
@@ -133,12 +136,6 @@ public class ImageFragment extends SupportFragment implements OnRecyclerItemClic
             }
 
         }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        initData();
     }
 
     @Override

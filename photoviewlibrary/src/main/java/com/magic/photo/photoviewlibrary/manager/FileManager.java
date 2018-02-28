@@ -221,4 +221,81 @@ public class FileManager {
         return list;
     }
 
+
+    public List<Video> getVideosFromCamera(Context context) {
+        List<Video> list = new ArrayList<>();
+        ContentResolver resolver = context.getContentResolver();
+
+        //selection: 指定查询条件
+        String selection = MediaStore.Video.Media.DATA + " like ?";
+        //设定查询目录
+        String cameraPath = "/storage/emulated/0/Camera";
+        //定义selectionArgs：
+        String[] selectionArgs = {cameraPath + "%"};
+        Cursor cursor = resolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, VIDEO_COLUMN, selection, selectionArgs, "date_added desc");
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String path = cursor.getString(cursor.getColumnIndex(VIDEO_COLUMN[1]));
+                if (!new File(path).exists()) {
+                    continue;
+                }
+                long id = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[0]));
+                String size = cursor.getString(cursor.getColumnIndex(VIDEO_COLUMN[2]));
+                if (TextUtils.isEmpty(size) || Integer.parseInt(size) < 1024) {
+                    continue;
+                }
+                long duration = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[3]));
+                if (duration == 0) {
+                    continue;
+                }
+                long createTime = cursor.getLong(cursor.getColumnIndex(VIDEO_COLUMN[4])) * 1000;
+                String mimeType = cursor.getString(cursor.getColumnIndex(VIDEO_COLUMN[5]));
+                String title = cursor.getString(cursor.getColumnIndex(VIDEO_COLUMN[6]));
+                Video video = new Video(id, path, size, duration, createTime, mimeType, title);
+                list.add(video);
+            }
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        return list;
+    }
+
+
+    public List<Image> getImageFormCamera(Context context) {
+        List<Image> list = new ArrayList<>();
+        ContentResolver resolver = context.getContentResolver();
+
+        //selection: 指定查询条件
+        String selection = MediaStore.Images.Media.DATA + " like ?";
+        //设定查询目录
+        String cameraPath = "/storage/emulated/0/Camera";
+        //定义selectionArgs：
+        String[] selectionArgs = {cameraPath + "%"};
+        Cursor cursor = resolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, IMAGE_COLUMN, selection, selectionArgs, "date_added desc");
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String path = cursor.getString(cursor.getColumnIndex(IMAGE_COLUMN[1]));
+                System.out.println(path);
+                long id = cursor.getLong(cursor.getColumnIndex(IMAGE_COLUMN[0]));
+                String size = cursor.getString(cursor.getColumnIndex(IMAGE_COLUMN[2]));
+                if (TextUtils.isEmpty(size) || Integer.parseInt(size) < 10240) {
+                    continue;
+                }
+                long createTime = cursor.getLong(cursor.getColumnIndex(IMAGE_COLUMN[3])) * 1000;
+                String mimeType = cursor.getString(cursor.getColumnIndex(IMAGE_COLUMN[4]));
+                String title = cursor.getString(cursor.getColumnIndex(IMAGE_COLUMN[5]));
+                Image image = new Image(id, path, size, createTime, mimeType, title);
+                list.add(image);
+            }
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        return list;
+    }
+
 }

@@ -91,16 +91,17 @@ public class VideoFragment extends SupportFragment implements OnRecyclerItemClic
         mRecyclerView.setAdapter(mAdapter);
         tvDelete.setOnClickListener(this);
         tvAllselect.setOnClickListener(this);
+        initData();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        initData();
+
     }
 
     private void initData() {
-        List<Video> videos = FileManager.getInstance().getVideosFromMedia(mActivity);
+        List<Video> videos = FileManager.getInstance().getVideosFromCamera(mActivity);
         mAdapter.setVideos(videos);
     }
 

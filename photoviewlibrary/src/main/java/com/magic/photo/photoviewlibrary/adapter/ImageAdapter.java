@@ -79,6 +79,7 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (holder instanceof VideoViewHolder) {
             VideoViewHolder viewHolder = ((VideoViewHolder) holder);
             viewHolder.mPlayIcon.setVisibility(View.GONE);
+            System.out.println(position + "..........");
             if (TextUtils.equals(mImageWraps.get(position).mImage.mimeType, "image/gif")) {
                 Glide.with(mContext).load(mImageWraps.get(position).mImage.path).asGif().into(viewHolder.mThumbnail);
             } else {
