@@ -4,6 +4,8 @@ def releaseTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
 }
 
+def apkName = "camera"
+
 android {
     compileSdkVersion 26
     defaultConfig {
@@ -11,7 +13,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
     }
     buildTypes {
         release {
@@ -24,7 +26,7 @@ android {
         variant.outputs.all {
             // abc_渠道名_版本名.apk  还可以拼接其他app内容：variant.versionCode  variant.buildType.name
 
-            outputFileName = "camera_v${variant.versionName}_${variant.flavorName}_${releaseTime()}.apk"
+            outputFileName = "${apkName}_v${variant.versionName}_${variant.flavorName}_${releaseTime()}.apk"
         }
     }
 }
