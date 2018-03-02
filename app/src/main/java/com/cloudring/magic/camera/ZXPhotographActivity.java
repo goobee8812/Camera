@@ -32,10 +32,10 @@ import com.cloudring.magic.camera.present.PhotographPresent;
 import com.cloudring.magic.camera.present.PhotographPresentImpl;
 import com.cloudring.magic.camera.present.SaveCallback;
 import com.cloudring.magic.camera.utils.CameraPreview;
+import com.cloudring.magic.camera.utils.PackageUtils;
 import com.cloudring.magic.camera.utils.PhotoEntity;
 import com.cloudring.magic.camera.utils.PowerWakeLock;
 import com.cloudring.magic.camera.utils.ScanPhoto;
-import com.magic.photo.photoviewlibrary.activity.PhotoMainActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -112,20 +112,13 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zxphotograph);
-
         requestCameraPermissions();
-
-
         boolean openRecord = getIntent().getBooleanExtra("open_record", false);
-
         if (openRecord) {
             startRecord();
         }
-
         ButterKnife.bind(this);
         initMediaPlayer();
-
-
     }
 
     private void requestCameraPermissions() {
@@ -178,8 +171,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
         Intent intent = new Intent("com.android.CloseCamera");
         sendBroadcast(intent);
         releaseCamera();
@@ -189,6 +180,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             mMediaPlayer.stop();
             mMediaPlayer.release();
         }
+        super.onDestroy();
     }
 
 
@@ -220,7 +212,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                 }
                 break;
             case R.id.ivPhotoAlbum:
-                startActivity(new Intent(this, PhotoMainActivity.class));
+                PackageUtils.startApplication(this,"com.magic.photo.photoviewlibrary");
                 releaseCamera();
                 break;
             case R.id.ivBack:
