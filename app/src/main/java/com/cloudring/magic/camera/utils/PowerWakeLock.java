@@ -55,19 +55,16 @@ public class PowerWakeLock {
 
     public void acquire() {
         if (sCpuWakeLock != null) {
-            System.out.println("acquire 电源锁");
             sCpuWakeLock.acquire();
             return;
         }
         createPartialWakeLock(context.getApplicationContext());
-        System.out.println("acquire 电源锁 0");
         sCpuWakeLock.acquire();
     }
 
 
     public void releaseLock() {
         if (sCpuWakeLock != null) {
-            System.out.println("释放电源锁");
             sCpuWakeLock.release();
             sCpuWakeLock = null;
         }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
-import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -23,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cloudring.magic.camera.utils.PowerWakeLock;
+import com.cloudring.magic.camera.utils.SingleMediaScanner;
 import com.cloudring.magic.camera.utils.SpUtil;
 
 import java.io.File;
@@ -108,7 +108,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         @Override
         public void run() {
             PowerWakeLock.getInstance(CustomRecordActivity.this).releaseLock();
-            isReleaseLock=true;
+            isReleaseLock = true;
         }
     };
 
@@ -304,7 +304,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         mRecordControl.setImageResource(R.mipmap.recordvideo_start);
                         stopRecord();
                         mCamera.lock();
-                        MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
+                        new SingleMediaScanner(this, currentVideoFilePath);
+//                        MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
                     }
                     mCurrentTime = System.currentTimeMillis();
                 } else {

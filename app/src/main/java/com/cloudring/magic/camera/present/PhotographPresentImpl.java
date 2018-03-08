@@ -1,6 +1,8 @@
 package com.cloudring.magic.camera.present;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -12,6 +14,7 @@ import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.cloudring.magic.camera.CustomRecordActivity;
+import com.cloudring.magic.camera.MyApp;
 import com.cloudring.magic.camera.PhotographActivity;
 import com.cloudring.magic.camera.ZXPhotographActivity;
 import com.cloudring.magic.camera.utils.ToastUtilKe;
@@ -108,6 +111,7 @@ public class PhotographPresentImpl implements PhotographPresent {
                     fos.close();
                     camera.startPreview();//拍照完毕以后需要再次开启preview以保证拍照以后继续给surfaceView传递摄像数据
                     // 通知图库更新
+                    updateMediaStore(pictureName);
                     callback.success(pictureName);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -118,6 +122,125 @@ public class PhotographPresentImpl implements PhotographPresent {
         };
         camera.takePicture(null, null, mPictureCallback);
     }
+
+
+    public void updateMediaStore(String path) {
+        ContentResolver cr = MyApp.getContext().getContentResolver();
+        ContentValues values = new ContentValues();
+        String type = "image/png";
+        if (type.startsWith("audio/")) {
+            values.put(MediaStore.Audio.Media.DATA, path);
+            cr.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
+            // LocalResource.getInstance().getPhoneMusics();
+        } else if (type.startsWith("video/")) {
+            values.put(MediaStore.Video.Media.DATA, path);
+            cr.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+            // LocalResource.getInstance().getPhoneVideos();
+        } else if (type.startsWith("image/")) {
+            values.put(MediaStore.Images.Media.DATA, path);
+            cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            //LocalResource.getInstance().getPhoneImages();
+        } else if (type.startsWith("text/") || type.equals("application/msword") || type.equals("application/vnd.ms-excel")) {
+            values.put("_data", path);
+            cr.insert(MediaStore.Files.getContentUri("external"), values);
+            //LocalResource.getInstance().getPhoneDocuments();
+        }
+    }
+
+
+    /**
+     * 根据文件后缀名获得对应的MIME类型。
+     *
+     * @param path
+     */
+    public String getMIMEType(String path) {
+        String type = "*/*";
+        //获取后缀名前的分隔符"."在fName中的位置。
+        int dotIndex = path.lastIndexOf(".");
+        if (dotIndex < 0) {
+            return type;
+        }
+        String[][] MIME_MapTable =
+                {
+                        {".3gp", "video/3gpp"},
+                        {".apk", "application/vnd.android.package-archive"},
+                        {".asf", "video/x-ms-asf"},
+                        {".avi", "video/x-msvideo"},
+                        {".bin", "application/octet-stream"},
+                        {".bmp", "image/bmp"},
+                        {".c", "text/plain"},
+                        {".class", "application/octet-stream"},
+                        {".conf", "text/plain"},
+                        {".cpp", "text/plain"},
+                        {".doc", "application/msword"},
+                        {".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+                        {".xls", "application/vnd.ms-excel"},
+                        {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+                        {".exe", "application/octet-stream"},
+                        {".gif", "image/gif"},
+                        {".gtar", "application/x-gtar"},
+                        {".gz", "application/x-gzip"},
+                        {".h", "text/plain"},
+                        {".htm", "text/html"},
+                        {".html", "text/html"},
+                        {".jar", "application/java-archive"},
+                        {".java", "text/plain"},
+                        {".jpeg", "image/jpeg"},
+                        {".jpg", "image/jpeg"},
+                        {".js", "application/x-javascript"},
+                        {".log", "text/plain"},
+                        {".m3u", "audio/x-mpegurl"},
+                        {".m4a", "audio/mp4a-latm"},
+                        {".m4b", "audio/mp4a-latm"},
+                        {".m4p", "audio/mp4a-latm"},
+                        {".m4u", "video/vnd.mpegurl"},
+                        {".m4v", "video/x-m4v"},
+                        {".mov", "video/quicktime"},
+                        {".mp2", "audio/x-mpeg"},
+                        {".mp3", "audio/x-mpeg"},
+                        {".mp4", "video/mp4"},
+                        {".mpc", "application/vnd.mpohun.certificate"},
+                        {".mpe", "video/mpeg"},
+                        {".mpeg", "video/mpeg"},
+                        {".mpg", "video/mpeg"},
+                        {".mpg4", "video/mp4"},
+                        {".mpga", "audio/mpeg"},
+                        {".msg", "application/vnd.ms-outlook"},
+                        {".ogg", "audio/ogg"},
+                        {".pdf", "application/pdf"},
+                        {".png", "image/png"},
+                        {".pps", "application/vnd.ms-powerpoint"},
+                        {".ppt", "application/vnd.ms-powerpoint"},
+                        {".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+                        {".prop", "text/plain"},
+                        {".rc", "text/plain"},
+                        {".rmvb", "audio/x-pn-realaudio"},
+                        {".rtf", "application/rtf"},
+                        {".sh", "text/plain"},
+                        {".tar", "application/x-tar"},
+                        {".tgz", "application/x-compressed"},
+                        {".txt", "text/plain"},
+                        {".wav", "audio/x-wav"},
+                        {".wma", "audio/x-ms-wma"},
+                        {".wmv", "audio/x-ms-wmv"},
+                        {".wps", "application/vnd.ms-works"},
+                        {".xml", "text/plain"},
+                        {".z", "application/x-compress"},
+                        {".zip", "application/x-zip-compressed"},
+                        {"", "*/*"}
+                };
+        /* 获取文件的后缀名 */
+        String end = path.substring(dotIndex).toLowerCase();
+        if (end == "") return type;
+        //在MIME和文件类型的匹配表中找到对应的MIME类型。
+        for (int i = 0; i < MIME_MapTable.length; i++) { //MIME_MapTable??在这里你一定有疑问，这个MIME_MapTable是什么？
+            if (end.equals(MIME_MapTable[i][0]))
+                type = MIME_MapTable[i][1];
+        }
+        return type;
+
+    }
+
 
     @Override
     public void getSystemPhoto(Activity activity) {

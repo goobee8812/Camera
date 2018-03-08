@@ -61,8 +61,6 @@ public final class VideoUtils {
                 timeCorrected = true;
             }
         }
-        System.out.println("trim startTime-->"+startTime);
-        System.out.println("trim endTime-->"+endTime);
         int x = 0;
         for (Track track : tracks) {
             long currentSample = 0;
@@ -92,10 +90,6 @@ public final class VideoUtils {
                     currentSample++;
                 }
             }
-
-
-            System.out.println("trim startSample-->"+startSample);
-            System.out.println("trim endSample-->"+endSample);
             movie.addTrack(new CroppedTrack(track, startSample, endSample));
 //            break;
         }
@@ -223,7 +217,6 @@ public final class VideoUtils {
                     // therefore +1
                     timeOfSyncSamples[Arrays.binarySearch(
                             track.getSyncSamples(), currentSample + 1)] = currentTime;
-                    System.out.println("currentTime-->" + currentTime);
                 }
                 currentTime += (double) entry.getDelta()
                         / (double) track.getTrackMetaData().getTimescale();
@@ -231,10 +224,9 @@ public final class VideoUtils {
             }
         }
 
-        // System.out.println("size-->"+currentSample);
 		*//*
 		 * for(int i=0;i<timeOfSyncSamples.length;i++){
-		 * System.out.println("data-->"+timeOfSyncSamples[i]); }
+		 *  }
 		 *//*
 
 		*//*

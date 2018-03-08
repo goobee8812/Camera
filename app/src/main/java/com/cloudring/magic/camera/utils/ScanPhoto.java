@@ -95,7 +95,6 @@ public class ScanPhoto {
                 if (!new File(path).exists() || (path.contains("wyt") && path.contains("flash")) || path.contains("huiben")) {
                     continue;
                 }
-                System.out.println(path);
                 String dataTime = pictureSortTime(path);//将所有图片的时间数据放到整型数组里
                 PhotoEntity entity = new PhotoEntity();
                 entity.url = path;//将图片的uri放到对象里去
