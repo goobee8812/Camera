@@ -233,8 +233,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             PowerWakeLock.getInstance(CustomRecordActivity.this).acquire();
             isReleaseLock = false;
         }
-
-
         sendBroadcast(new Intent("com.android.Camera.startvideo"));
         initCamera();
         mCamera.unlock();

@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -91,7 +92,8 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     private MediaPlayer mMediaPlayer;
     private int releaseLockTime = 2 * 60 * 1000;
     private boolean isReleaseLock;
-    PhotographPresent photographPresent = new PhotographPresentImpl();
+    private PhotographPresent photographPresent = new PhotographPresentImpl();
+    private ScreenOffBroadCast screenOffBroadCast;
     Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -125,7 +127,14 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         ButterKnife.bind(this);
         initMediaPlayer();
 
+        registerScreenOffBroadCast();
+    }
 
+    private void registerScreenOffBroadCast() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        screenOffBroadCast = new ScreenOffBroadCast();
+        registerReceiver(screenOffBroadCast, filter);
     }
 
     private void requestCameraPermissions() {
@@ -152,7 +161,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         PhotographPresentImpl.isPhotoStopThread = false;
         initReceiver();
 
-        isReleaseLock=true;
+        isReleaseLock = true;
         resetLock();
 
     }
@@ -169,6 +178,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     @Override
     protected void onPause() {
         super.onPause();
+
         ScanPhoto.getInstance(this).setOnLookUpPhotosCallback(null);
         releaseCamera();
         PhotographPresentImpl.isPhotoStopThread = true;
@@ -180,14 +190,16 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     protected void onDestroy() {
         super.onDestroy();
 
+
         Intent intent = new Intent("com.android.CloseCamera");
         sendBroadcast(intent);
-        releaseCamera();
-        PhotographPresentImpl.isPhotoStopThread = true;
-        handler.removeCallbacksAndMessages(null);
         if (mMediaPlayer != null) {
             mMediaPlayer.stop();
             mMediaPlayer.release();
+        }
+
+        if (screenOffBroadCast != null) {
+            unregisterReceiver(screenOffBroadCast);
         }
     }
 
@@ -220,7 +232,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                 }
                 break;
             case R.id.ivPhotoAlbum:
-                PackageUtils.startApplication(this,"com.magic.photo.photoviewlibrary");
+                PackageUtils.startApplication(this, "com.magic.photo.photoviewlibrary");
                 releaseCamera();
                 break;
             case R.id.ivBack:
@@ -443,11 +455,21 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     ivRecording.performClick();
                     break;
                 case "com.android.Camera.stopVideo"://停止录像广播
-
                     ivRecording.performClick();
                     break;
                 default:
                     break;
+            }
+        }
+    }
+
+    public class ScreenOffBroadCast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (TextUtils.equals(action, Intent.ACTION_SCREEN_OFF)){
+                Intent closeCamera = new Intent("com.android.CloseCamera");
+                sendBroadcast(closeCamera);
             }
         }
     }
