@@ -21,6 +21,7 @@ import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.cloudring.magic.camera.utils.FileUtils;
 import com.cloudring.magic.camera.utils.PowerWakeLock;
 import com.cloudring.magic.camera.utils.SingleMediaScanner;
 import com.cloudring.magic.camera.utils.SpUtil;
@@ -112,10 +113,35 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         }
     };
 
+    private Runnable checkSDFree = new Runnable() {
+        @Override
+        public void run() {
+            if (!checkSDFreeSize()) {
+                showToastLong("内存剩余不足，暂停录像!");
+                mRecordControl.performClick();
+            } else {
+                handler.postDelayed(checkSDFree, 60 * 1000);
+            }
+
+        }
+    };
+
+
+    //检查SD卡剩余空间，小于200M不能录像
+    private boolean checkSDFreeSize() {
+        long size = FileUtils.getSDFreeSize();
+        if (size >= 300 * 1024 * 1024) {
+            System.out.println("-------");
+            return true;
+        }
+        return false;
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         handler.removeCallbacks(releaseLock);
+        handler.removeCallbacks(checkSDFree);
         unregisterReceiver(photographBroadCast);
         if (isRecording) {
             mRecordControl.setImageResource(R.mipmap.recordvideo_start);
@@ -228,6 +254,10 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
 
     public void startRecord() {
+        if (!checkSDFreeSize()) {
+            showToastLong("内存剩余不足，无法使用录像");
+            return;
+        }
         handler.removeCallbacks(releaseLock);
         if (isReleaseLock) {
             PowerWakeLock.getInstance(CustomRecordActivity.this).acquire();
@@ -254,12 +284,15 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         }
         mRecordTime.start();
 
+        mRecordControl.setImageResource(R.mipmap.recordvideo_stop);
+        handler.postDelayed(checkSDFree, 60 * 1000);
     }
 
     /**
      * 停止录制视频
      */
     public void stopRecord() {
+        handler.removeCallbacks(checkSDFree);
         handler.postDelayed(releaseLock, releaseLockTime);
         sendBroadcast(new Intent("com.android.Camera.stopvideo"));
         if (isRecording && mediaRecorder != null) {
@@ -295,7 +328,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                     if (!isRecording) {
                         //开始录制视频
                         startRecord();
-                        mRecordControl.setImageResource(R.mipmap.recordvideo_stop);
                         //1s后才能停止
                     } else {
                         //停止视频录制
@@ -341,6 +373,18 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         if (!TextUtils.isEmpty(text)) {
             if (toast == null) {
                 toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+            } else {
+                toast.setText(text);
+            }
+            toast.show();
+        }
+    }
+
+    public void showToastLong(String text) {
+
+        if (!TextUtils.isEmpty(text)) {
+            if (toast == null) {
+                toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
             } else {
                 toast.setText(text);
             }

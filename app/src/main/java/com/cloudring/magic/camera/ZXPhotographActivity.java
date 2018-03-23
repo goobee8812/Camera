@@ -375,7 +375,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         if (mCamera != null) {
             releaseCamera();
         }
-
         if (mCamera == null) {
             mCamera = getCameraInstance();
         }
