@@ -16,14 +16,15 @@ import java.util.List;
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
-    private int PREVIEW_WIDTH=1280;
-    private int PREVIEW_HEIGHT=720;
+    private int PREVIEW_WIDTH = 1280;
+    private int PREVIEW_HEIGHT = 720;
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
         mHolder = getHolder();
         mHolder.addCallback(this);
+
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
@@ -36,19 +37,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             parameters.setPictureFormat(ImageFormat.JPEG);
             parameters.setPreviewFormat(ImageFormat.NV21);
-            parameters.setFocusMode(Camera.Parameters.FLASH_MODE_AUTO);
 
+            List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+            for (Camera.Size previewSize : previewSizes) {
+                if (previewSize.width == PREVIEW_WIDTH && previewSize.height == PREVIEW_HEIGHT) {
+                    parameters.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+                    break;
+                }
+            }
 
-            List<Camera.Size> pictureSizes = mCamera.getParameters()
-                    .getSupportedPictureSizes();
-
-
-            parameters.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-
+            List<Camera.Size> pictureSizes = parameters.getSupportedPictureSizes();
             Camera.Size fs = null;
             for (int i = 0; i < pictureSizes.size(); i++) {
                 Camera.Size psize = pictureSizes.get(i);
-                if(fs == null && psize.width >= 1280){
+                if (fs == null && psize.width >= 1280) {
                     fs = psize;
                 }
             }
