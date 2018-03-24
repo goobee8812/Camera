@@ -509,7 +509,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     wantTakePic();
                     break;
                 case "com.android.Camera.takePhotoFast"://直接拍照
-                    mMediaPlayer.start();
+                    takePhoto();
                     break;
                 case "com.android.Camera.closeCamera"://按返回键
                     finish();
@@ -544,43 +544,45 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         count--;
         if (count == 0) {
             teTimeDown.setVisibility(View.GONE);
-            mMediaPlayer.start();
+            takePhoto();
         }
         return count;
     }
 
 
     private void initMediaPlayer() {
-        mMediaPlayer = MediaPlayer.create(this, R.raw.takephotoes);
-        // 确保我们的MediaPlayer在播放时获取了一个唤醒锁，
-        // 如果不这样做，当歌曲播放很久时，CPU进入休眠从而导致播放停止
-        // 要使用唤醒锁，要确保在AndroidManifest.xml中声明了android.permission.WAKE_LOCK权限
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        // 在MediaPlayer在它准备完成时、完成播放时、发生错误时通过监听器通知我们，
-        // 以便我们做出相应处理
-        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer player) {
-                //	isPrepared = true;
-                player.setVolume(1.0f, 1.0f); // 设置大声播放
-                //  player.start();
-            }
-        });
-
-
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer arg0) {
-
-                if (animation != null) {     //animation为null此时是直接进入相机进行拍照
-                    animation.cancel();
+        try {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.takephotoes);
+            // 确保我们的MediaPlayer在播放时获取了一个唤醒锁，
+            // 如果不这样做，当歌曲播放很久时，CPU进入休眠从而导致播放停止
+            // 要使用唤醒锁，要确保在AndroidManifest.xml中声明了android.permission.WAKE_LOCK权限
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            // 在MediaPlayer在它准备完成时、完成播放时、发生错误时通过监听器通知我们，
+            // 以便我们做出相应处理
+            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer player) {
+                    //	isPrepared = true;
+                    player.setVolume(1.0f, 1.0f); // 设置大声播放
+                    //  player.start();
                 }
-                //开始照相
-                photographPresent.takePhoto(mCamera, ZXPhotographActivity.this, ZXPhotographActivity.this);
+            });
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer arg0) {
 
-                resetLock();
-            }
-        });
+                    if (animation != null) {     //animation为null此时是直接进入相机进行拍照
+                        animation.cancel();
+                    }
+                    //开始照相
+                    photographPresent.takePhoto(mCamera, ZXPhotographActivity.this, ZXPhotographActivity.this);
+
+                    resetLock();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void resetLock() {
@@ -600,7 +602,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         } catch (Exception e) {
             e.printStackTrace();
             teTimeDown.setVisibility(View.GONE);
-            mMediaPlayer.start();
+            takePhoto();
         }
 
     }
@@ -616,7 +618,21 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         } catch (Exception e) {
             e.printStackTrace();
             teTimeDown.setVisibility(View.GONE);
+            takePhoto();
+        }
+    }
+
+    private void takePhoto() {
+        if (mMediaPlayer != null) {
             mMediaPlayer.start();
+        } else {
+            if (animation != null) {
+                animation.cancel();
+            }
+            //开始照相
+            photographPresent.takePhoto(mCamera, ZXPhotographActivity.this, ZXPhotographActivity.this);
+
+            resetLock();
         }
     }
 }

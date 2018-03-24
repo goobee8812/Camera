@@ -97,7 +97,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onResume() {
         super.onResume();
-        sendBroadcast(new Intent("com.android.Camera.stopvideo"));
+        sendBroadcast(new Intent("com.android.Camera.Video_stop"));
         registerReceiver();
         initCamera();
 
@@ -263,7 +263,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             PowerWakeLock.getInstance(CustomRecordActivity.this).acquire();
             isReleaseLock = false;
         }
-        sendBroadcast(new Intent("com.android.Camera.startvideo"));
+        sendBroadcast(new Intent("com.android.Camera.Video_start"));
         initCamera();
         mCamera.unlock();
         setConfigRecord();
@@ -294,7 +294,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     public void stopRecord() {
         handler.removeCallbacks(checkSDFree);
         handler.postDelayed(releaseLock, releaseLockTime);
-        sendBroadcast(new Intent("com.android.Camera.stopvideo"));
+        sendBroadcast(new Intent("com.android.Camera.Video_stop"));
         if (isRecording && mediaRecorder != null) {
             // 设置后不会崩
             mediaRecorder.setOnErrorListener(null);
