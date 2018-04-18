@@ -276,7 +276,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         }
         isRecording = true;
         mRecordTime.setVisibility(View.VISIBLE);
-        ivCamera.setVisibility(View.GONE);
+  //      ivCamera.setVisibility(View.GONE);
         if (mPauseTime != 0) {
             mRecordTime.setBase(SystemClock.elapsedRealtime() - (mPauseTime - mRecordTime.getBase()));
         } else {
@@ -284,7 +284,10 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         }
         mRecordTime.start();
 
-        mRecordControl.setImageResource(R.mipmap.recordvideo_stop);
+       // mRecordControl.setImageResource(R.mipmap.recordvideo_stop);
+        mRecordControl.setImageResource(R.mipmap.videorecording);
+
+
         handler.postDelayed(checkSDFree, 60 * 1000);
     }
 
@@ -313,7 +316,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             }
             mRecordTime.stop();
             mRecordTime.setVisibility(View.GONE);
-            ivCamera.setVisibility(View.VISIBLE);
+ //           ivCamera.setVisibility(View.VISIBLE);
             isRecording = false;
             mPauseTime = 0;
         }
@@ -331,7 +334,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         //1s后才能停止
                     } else {
                         //停止视频录制
-                        mRecordControl.setImageResource(R.mipmap.recordvideo_start);
+                        mRecordControl.setImageResource(R.mipmap.video);
                         stopRecord();
                         mCamera.lock();
                         new SingleMediaScanner(this, currentVideoFilePath);
