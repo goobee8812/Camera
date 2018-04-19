@@ -10,53 +10,115 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+
+    <Chronometer
+        android:id="@+id/record_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:format="%s"
+        android:textColor="@android:color/white"
+        android:textSize="22sp" />
+
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:background="#52000000"-->
+        <!--android:padding="10dp">-->
+
+        <!--&lt;!&ndash; 开始/结束 录制按钮 &ndash;&gt;-->
+        <!--<ImageView-->
+            <!--android:id="@+id/record_control"-->
+            <!--android:layout_width="60dp"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:src="@mipmap/recordvideo_start" />-->
+
+
+        <!--<Chronometer-->
+            <!--android:id="@+id/record_time"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentEnd="true"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_marginRight="20dp"-->
+            <!--android:format="%s"-->
+            <!--android:textColor="@android:color/white"-->
+            <!--android:textSize="20sp" />-->
+
+    <!--</RelativeLayout>-->
+
+
+
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="72dp"
+        android:background="#52000000"
         android:layout_alignParentBottom="true"
-        android:background="#66666666"
-        android:padding="10dp">
-
-        <!-- 开始/结束 录制按钮 -->
-        <ImageView
-            android:id="@+id/record_control"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_centerInParent="true"
-            android:src="@mipmap/recordvideo_start" />
-
-
-        <Chronometer
-            android:id="@+id/record_time"
+        >
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dp"
-            android:format="%s"
-            android:textColor="@android:color/white"
-            android:textSize="20sp" />
+            android:layout_centerInParent="true"
+            >
+            <ImageView
+                android:id="@+id/ivCamera"
+                android:layout_width="51dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:src="@mipmap/camera"
+                />
+            <ImageView
+                android:id="@+id/record_control"
+                android:layout_width="51dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/video"
+                android:layout_marginLeft="80dp"
+                android:layout_gravity="center_vertical"
+                />
+        </LinearLayout>
+        <!--<de.hdodenhof.circleimageview.CircleImageView-->
+            <!--android:id="@+id/ivPhotoAlbum"-->
+            <!--android:layout_width="56dp"-->
+            <!--android:layout_height="56dp"-->
+            <!--android:layout_marginStart="20dp"-->
+            <!--android:scaleType="centerCrop"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--/>-->
 
+
+
+        <!--&lt;!&ndash; 开始/结束 录制按钮 &ndash;&gt;-->
+        <!--<ImageView-->
+            <!--android:id="@+id/record_control"-->
+            <!--android:layout_width="60dp"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:src="@mipmap/recordvideo_start" />-->
     </RelativeLayout>
-
-    <ImageView
-        android:id="@+id/ivCamera"
-        android:layout_width="106dp"
-        android:layout_height="106dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="50dp"
-        android:src="@mipmap/camera_icon" />
+    <!--<ImageView-->
+        <!--android:id="@+id/ivCamera"-->
+        <!--android:layout_width="106dp"-->
+        <!--android:layout_height="106dp"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_marginRight="50dp"-->
+        <!--android:src="@mipmap/camera_icon"-->
+        <!---->
+        <!--/>-->
 
     <ImageView
         android:id="@+id/ivBack"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="22dp"
         android:layout_marginTop="22dp"
         android:background="?selectableItemBackground"
         android:clickable="true"
-        android:src="@mipmap/back_hui" />
+        android:src="@mipmap/top_return_icon" />
 
 </RelativeLayout>

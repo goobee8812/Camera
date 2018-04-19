@@ -70,8 +70,8 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     TextView tvDelay3s;
     @BindView(R.id.ivDelay6s)
     ImageView ivDelay6s;
-    @BindView(R.id.ivRecording)
-    ImageView ivRecording;
+    @BindView(R.id.ivRecord)
+    ImageView ivRecord;
     @BindView(R.id.tvDelay6s)
     TextView tvDelay6s;
     @BindView(R.id.timedown)
@@ -234,7 +234,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         }
     }
 
-    @OnClick({R.id.ivDelay, R.id.ivPhotoAlbum, R.id.ivBack, R.id.ivTakingPictures, R.id.ivRecording, R.id.flDelayClose, R.id.flDelay3s, R.id.flDelay6S})
+    @OnClick({R.id.ivDelay, R.id.ivPhotoAlbum, R.id.ivBack, R.id.ivTakingPictures, R.id.ivRecord, R.id.flDelayClose, R.id.flDelay3s, R.id.flDelay6S})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.ivDelay:
@@ -271,7 +271,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     }
                 }
                 break;
-            case R.id.ivRecording:
+            case R.id.ivRecord:
                 startRecord();
                 break;
             case R.id.flDelayClose:
@@ -516,10 +516,10 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     break;
                 case "com.android.Camera.startVideo"://启动录像广播
                     //VoiceTTSManager.getInstance(CommonLib.getContext()).speak("好的,咚咚正在为您打开！");
-                    ivRecording.performClick();
+                    ivRecord.performClick();
                     break;
                 case "com.android.Camera.stopVideo"://停止录像广播
-                    ivRecording.performClick();
+                    ivRecord.performClick();
                     break;
                 default:
                     break;
