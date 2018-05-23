@@ -151,10 +151,9 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         unregisterReceiver(photographBroadCast);
         if (isRecording) {
             //mRecordControl.setImageResource(R.mipmap.recordvideo_start);
-            startAnimVideo();
-
-
+           // startAnimVideo();
             stopRecord();
+            stopAnimVideo();
             mCamera.lock();
             delVideo();
         }
