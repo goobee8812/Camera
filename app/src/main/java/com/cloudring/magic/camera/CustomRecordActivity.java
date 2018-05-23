@@ -344,7 +344,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         //1s后才能停止
                     } else {
                         //停止视频录制
-                      //  mRecordControl.setImageResource(R.mipmap.video);
                         stopAnimVideo();
                         stopRecord();
                         mCamera.lock();
@@ -555,8 +554,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
     private void setXml2FrameAnim() {
 
-        // 把动画资源设置为imageView的背景,也可直接在XML里面设置
-      //  imageView.setBackgroundResource(R.drawable.frame_anim);
         animationDrawable = (AnimationDrawable) mRecordControl.getBackground();
     }
 
@@ -570,6 +567,11 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private void  stopAnimVideo(){
         if (animationDrawable != null && animationDrawable.isRunning()) {
             animationDrawable.stop();
+            //mRecordControl.setBackgroundResource(R.drawable.frame_anim);   //重新设置一次，回复到原来初始状态
+           // mRecordControl.setBackground(new Drawable);
+            mRecordControl.setBackground(this.getResources().getDrawable(R.drawable.frame_anim));
+            animationDrawable = (AnimationDrawable) mRecordControl.getBackground();
+
         }
     }
 

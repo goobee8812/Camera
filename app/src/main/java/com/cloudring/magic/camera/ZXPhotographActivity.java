@@ -379,7 +379,8 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             mCamera = getCameraInstance();
         }
         if (mCamera == null) {
-            Toast.makeText(this, "打开相机失败", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "打开相机失败", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "openCamera: 打开相机失败");
             return;
         }
         try {
