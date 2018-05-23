@@ -67,15 +67,15 @@
             >
             <ImageView
                 android:id="@+id/ivCamera"
-                android:layout_width="51dp"
-                android:layout_height="40dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:src="@mipmap/cameara_normal_low"
+                android:background="@drawable/cameara_normal_low"
                 />
             <ImageView
                 android:id="@+id/record_control"
-                android:layout_width="51dp"
-                android:layout_height="40dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="@drawable/frame_anim"
                 android:layout_marginLeft="80dp"
                 android:layout_gravity="center_vertical"
@@ -113,12 +113,12 @@
 
     <ImageView
         android:id="@+id/ivBack"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="22dp"
         android:layout_marginTop="22dp"
         android:background="?selectableItemBackground"
         android:clickable="true"
-        android:src="@mipmap/top_return_icon" />
+        android:src="@drawable/top_return_icon" />
 
 </RelativeLayout>
