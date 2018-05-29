@@ -11,7 +11,7 @@ android {
         release {
             keyAlias 'cloudring_key'
             keyPassword '147258'
-            storeFile file('cloudring_key.jks')
+            storeFile file('../cloudring_key.jks')
             storePassword '147258'
         }
     }
