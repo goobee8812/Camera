@@ -137,7 +137,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private boolean checkSDFreeSize() {
         long size = FileUtils.getSDFreeSize();
         if (size >= 300 * 1024 * 1024) {
-            System.out.println("-------");
             return true;
         }
         return false;
@@ -155,7 +154,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             stopRecord();
             stopAnimVideo();
             mCamera.lock();
-            delVideo();
+//            delVideo();
         }
         stopCamera();
 
