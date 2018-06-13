@@ -113,6 +113,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     private SurfaceHolder mHolder;
     private int PREVIEW_WIDTH = 1280;
     private int PREVIEW_HEIGHT = 720;
+    private int Picture_WIDTH = 800;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -379,7 +380,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             mCamera = getCameraInstance();
         }
         if (mCamera == null) {
-           // Toast.makeText(this, "打开相机失败", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "打开相机失败", Toast.LENGTH_SHORT).show();
             Log.e(TAG, "openCamera: 打开相机失败");
             return;
         }
@@ -468,7 +469,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             Camera.Size fs = null;
             for (int i = 0; i < pictureSizes.size(); i++) {
                 Camera.Size psize = pictureSizes.get(i);
-                if (fs == null && psize.width >= 1280) {
+                if (psize.width == Picture_WIDTH) {
                     fs = psize;
                 }
             }
