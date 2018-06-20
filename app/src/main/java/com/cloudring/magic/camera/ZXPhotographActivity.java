@@ -113,7 +113,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     private SurfaceHolder mHolder;
     private int PREVIEW_WIDTH = 1280;
     private int PREVIEW_HEIGHT = 720;
-    private int Picture_WIDTH = 800;
+    private int Picture_WIDTH = 1600;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -265,7 +265,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                 }
                 if (!isDelay3 && !isDelay6) {
                     //正常拍摄
-                    if (System.currentTimeMillis() - mCurrentTime > 1000) {
+                    if (System.currentTimeMillis() - mCurrentTime > 1400) {
                         photographPresent.takePhoto(mCamera, this, this);
                         mCurrentTime = System.currentTimeMillis();
                         resetLock();
@@ -464,7 +464,6 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
                     break;
                 }
             }
-
             List<Camera.Size> pictureSizes = parameters.getSupportedPictureSizes();
             Camera.Size fs = null;
             for (int i = 0; i < pictureSizes.size(); i++) {

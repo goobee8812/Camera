@@ -92,6 +92,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         initView();
         setXml2FrameAnim();
 
+
     }
 
     @Override
@@ -104,6 +105,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     protected void onResume() {
         super.onResume();
         sendBroadcast(new Intent("com.android.Camera.Video_stop"));
+        sendBroadcast(new Intent("com.cloudring.magic.voice.stoprecord"));
         registerReceiver();
         initCamera();
 
@@ -125,7 +127,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             if (!checkSDFreeSize()) {
                 showToastLong("内存剩余不足，暂停录像!");
                 mRecordControl.performClick();
-             } else {
+            } else {
                 handler.postDelayed(checkSDFree, 60 * 1000);
             }
 
@@ -145,12 +147,13 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onPause() {
         super.onPause();
+        sendBroadcast(new Intent("com.cloudring.magic.voice.startrecord"));
         handler.removeCallbacks(releaseLock);
         handler.removeCallbacks(checkSDFree);
         unregisterReceiver(photographBroadCast);
         if (isRecording) {
             //mRecordControl.setImageResource(R.mipmap.recordvideo_start);
-           // startAnimVideo();
+            // startAnimVideo();
             stopRecord();
             stopAnimVideo();
             mCamera.lock();
@@ -283,7 +286,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         }
         isRecording = true;
         mRecordTime.setVisibility(View.VISIBLE);
-  //      ivCamera.setVisibility(View.GONE);
+        //      ivCamera.setVisibility(View.GONE);
         if (mPauseTime != 0) {
             mRecordTime.setBase(SystemClock.elapsedRealtime() - (mPauseTime - mRecordTime.getBase()));
         } else {
@@ -291,8 +294,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         }
         mRecordTime.start();
 
-       // mRecordControl.setImageResource(R.mipmap.recordvideo_stop);
-       // mRecordControl.setImageResource(R.mipmap.videorecording);
+        // mRecordControl.setImageResource(R.mipmap.recordvideo_stop);
+        // mRecordControl.setImageResource(R.mipmap.videorecording);
         startAnimVideo();
 
 
@@ -324,7 +327,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             }
             mRecordTime.stop();
             mRecordTime.setVisibility(View.GONE);
- //           ivCamera.setVisibility(View.VISIBLE);
+            //           ivCamera.setVisibility(View.VISIBLE);
             isRecording = false;
             mPauseTime = 0;
         }
@@ -556,17 +559,17 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-    private void  startAnimVideo(){
-       if (animationDrawable != null && !animationDrawable.isRunning()) {
-           animationDrawable.start();
-       }
-   }
+    private void startAnimVideo() {
+        if (animationDrawable != null && !animationDrawable.isRunning()) {
+            animationDrawable.start();
+        }
+    }
 
-    private void  stopAnimVideo(){
+    private void stopAnimVideo() {
         if (animationDrawable != null && animationDrawable.isRunning()) {
             animationDrawable.stop();
             //mRecordControl.setBackgroundResource(R.drawable.frame_anim);   //重新设置一次，回复到原来初始状态
-           // mRecordControl.setBackground(new Drawable);
+            // mRecordControl.setBackground(new Drawable);
             mRecordControl.setBackground(this.getResources().getDrawable(R.drawable.frame_anim));
             animationDrawable = (AnimationDrawable) mRecordControl.getBackground();
 
