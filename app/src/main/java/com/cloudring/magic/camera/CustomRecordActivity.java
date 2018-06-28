@@ -36,30 +36,30 @@ import java.util.List;
 
 public class CustomRecordActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static final int CONTROL_CODE = 1;
-    private static final String TAG = "CustomRecordActivity";
-    private Toast toast;
+    public static final  int    CONTROL_CODE = 1;
+    private static final String TAG          = "CustomRecordActivity";
+    private Toast         toast;
     //UI
-    private ImageView mRecordControl;
-    private ImageView ivBack;
-    private ImageView ivCamera;
-    private SurfaceView surfaceView;
+    private ImageView     mRecordControl;
+    private ImageView     ivBack;
+    private ImageView     ivCamera;
+    private SurfaceView   surfaceView;
     private SurfaceHolder mSurfaceHolder;
-    private Chronometer mRecordTime;
+    private Chronometer   mRecordTime;
     //DATA
-    private boolean isRecording;// 标记，判断当前是否正在录制
+    private boolean       isRecording;// 标记，判断当前是否正在录制
     private long mPauseTime = 0;           //录制暂停时间间隔
     // 存储文件
-    private File mVecordFile;
-    private Camera mCamera;
-    private MediaRecorder mediaRecorder;
-    private String currentVideoFilePath;
+    private File                mVecordFile;
+    private Camera              mCamera;
+    private MediaRecorder       mediaRecorder;
+    private String              currentVideoFilePath;
     private PhotographBroadCast photographBroadCast;
-    private int width = 1280;
+    private int width  = 1280;
     private int height = 720;
     private long mCurrentTime;
-    private Handler handler = new Handler();
-    private int releaseLockTime = 2 * 60 * 1000;
+    private Handler handler         = new Handler();
+    private int     releaseLockTime = 2 * 60 * 1000;
     private boolean isReleaseLock;
 
     private AnimationDrawable animationDrawable;
@@ -240,6 +240,13 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                     break;
                 }
             }
+//            List<Camera.Size> sizelist = params.getSupportedVideoSizes();
+//
+//            for (Camera.Size size : sizelist) {
+//                Log.e(TAG, "setCameraParams:   "+size.width + "..." + size.height);
+//            }
+
+
             List<int[]> fpsRanges = params.getSupportedPreviewFpsRange();
             if (fpsRanges.size() > 0) {
                 int[] range = fpsRanges.get(0);
@@ -349,7 +356,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                         stopRecord();
                         mCamera.lock();
                         new SingleMediaScanner(this, currentVideoFilePath);
-//                        MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
+                        //                        MediaScannerConnection.scanFile(this, new String[]{currentVideoFilePath}, null, null);
                     }
                     mCurrentTime = System.currentTimeMillis();
                 } else {

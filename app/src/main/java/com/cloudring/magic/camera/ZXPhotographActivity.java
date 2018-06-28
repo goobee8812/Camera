@@ -457,22 +457,39 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             parameters.setPictureFormat(ImageFormat.JPEG);
             parameters.setPreviewFormat(ImageFormat.NV21);
 
-            List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-            for (Camera.Size previewSize : previewSizes) {
-                if (previewSize.width == PREVIEW_WIDTH && previewSize.height == PREVIEW_HEIGHT) {
-                    parameters.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-                    break;
-                }
+            if (MyApp.deviceId == 0) {
+
+                parameters.setPreviewSize(1024, 768);
+                parameters.setPictureSize(1600, 1200);
+            }else {
+                List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+                            for (Camera.Size previewSize : previewSizes) {
+                                if (previewSize.width == PREVIEW_WIDTH && previewSize.height == PREVIEW_HEIGHT) {
+                                    parameters.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+                                    break;
+                                }
+                            }
+
+
+
+
+                List<Camera.Size> pictureSizes = parameters.getSupportedPictureSizes();
+                Camera.Size fs = null;
+                            for (int i = 0; i < pictureSizes.size(); i++) {
+                                Camera.Size psize = pictureSizes.get(i);
+                                if (psize.width == Picture_WIDTH) {
+                                    fs = psize;
+                                }
+                            }
+                parameters.setPictureSize(fs.width, fs.height);
+
+
+
             }
-            List<Camera.Size> pictureSizes = parameters.getSupportedPictureSizes();
-            Camera.Size fs = null;
-            for (int i = 0; i < pictureSizes.size(); i++) {
-                Camera.Size psize = pictureSizes.get(i);
-                if (psize.width == Picture_WIDTH) {
-                    fs = psize;
-                }
-            }
-            parameters.setPictureSize(fs.width, fs.height);
+
+
+
+
             mCamera.setParameters(parameters);
 
         } catch (Exception e) {
