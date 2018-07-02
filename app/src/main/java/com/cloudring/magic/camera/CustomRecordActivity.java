@@ -510,7 +510,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         // 设置视频录制的分辨率。必须放在设置编码和格式的后面，否则报错
         mediaRecorder.setVideoSize(800, 600);
         mediaRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);// 设置帧频率，然后就清晰了
-        mediaRecorder.setVideoFrameRate(50);
+        mediaRecorder.setVideoFrameRate(30);
         mediaRecorder.setPreviewDisplay(surfaceView.getHolder().getSurface());
         //        //设置录像视频保存地址
         currentVideoFilePath = getSDPath(getApplicationContext()) + getVideoName();
