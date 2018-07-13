@@ -108,7 +108,6 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         sendBroadcast(new Intent("com.cloudring.magic.voice.stoprecord"));
         registerReceiver();
         initCamera();
-
         isReleaseLock = true;
         resetLock();
     }

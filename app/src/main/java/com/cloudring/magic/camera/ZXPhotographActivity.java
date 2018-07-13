@@ -458,9 +458,11 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             parameters.setPreviewFormat(ImageFormat.NV21);
 
             if (MyApp.deviceId == 0) {
-
                 parameters.setPreviewSize(1024, 768);
                 parameters.setPictureSize(1600, 1200);
+
+//                parameters.setPreviewSize(1024, 768);
+//                parameters.setPictureSize(1600, 1200);
             }else {
                 List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
                             for (Camera.Size previewSize : previewSizes) {
