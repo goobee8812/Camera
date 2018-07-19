@@ -231,6 +231,10 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
 
     private void setCameraParams() {
+        if (MyApp.deviceId == 1){
+            width = 1024;
+            height = 600;
+        }
         if (mCamera != null) {
             Camera.Parameters params = mCamera.getParameters();
             for (Camera.Size size : params.getSupportedPreviewSizes()) {
@@ -239,12 +243,12 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                     break;
                 }
             }
-//            List<Camera.Size> sizelist = params.getSupportedVideoSizes();
-//
-//            for (Camera.Size size : sizelist) {
-//                Log.e(TAG, "setCameraParams:   "+size.width + "..." + size.height);
-//            }
 
+            for (String focusMode : params.getSupportedFocusModes()){
+                if (focusMode.equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)){
+                    params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+                }
+            }
 
             List<int[]> fpsRanges = params.getSupportedPreviewFpsRange();
             if (fpsRanges.size() > 0) {
@@ -507,7 +511,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         //mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
         // 设置视频录制的分辨率。必须放在设置编码和格式的后面，否则报错
-        mediaRecorder.setVideoSize(800, 600);
+        mediaRecorder.setVideoSize(640, 480);
         mediaRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);// 设置帧频率，然后就清晰了
         mediaRecorder.setVideoFrameRate(30);
         mediaRecorder.setPreviewDisplay(surfaceView.getHolder().getSurface());
