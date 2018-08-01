@@ -24,7 +24,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="@dimen/DIMEN_72DP"
         android:id="@+id/flToolbar"
         android:layout_alignParentTop="true"
         android:orientation="vertical" >
@@ -32,19 +32,19 @@
         <TextView
             android:id="@+id/tvTitleName"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="@dimen/DIMEN_72DP"
             android:layout_gravity="center_vertical"
             android:gravity="center"
             android:textColor="#e8e8e8"
-            android:textSize="32sp" />
+            android:textSize="@dimen/DIMEN_32SP" />
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="@dimen/DIMEN_72DP"
+            android:layout_height="@dimen/DIMEN_72DP"
             android:layout_gravity="center_vertical"
             android:clickable="true"
-            android:padding="12dp"
+            android:padding="@dimen/DIMEN_12DP"
             android:background="@drawable/chat_back"
             />
 
@@ -54,11 +54,11 @@
   <!--  android:layout_marginBottom="20dp"-->
     <ImageView
         android:id="@+id/iv_chatvideomsg_record"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="@dimen/DIMEN_80DP"
+        android:layout_height="@dimen/DIMEN_80DP"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="50dp"
+        android:layout_marginRight="@dimen/DIMEN_50DP"
         android:background="@drawable/chat_record_video_btn"
 
 
@@ -99,20 +99,20 @@
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="@dimen/DIMEN_60DP"
         >
         <ImageView
             android:id="@+id/iv_chat_videomsg_cancel"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="@dimen/DIMEN_80DP"
+            android:layout_height="@dimen/DIMEN_80DP"
             android:background="@drawable/chat_videomsg_cancel"
             android:visibility="gone"
             />
         <ImageView
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="@dimen/DIMEN_50DP"
             android:id="@+id/iv_chat_videomsg_send"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="@dimen/DIMEN_80DP"
+            android:layout_height="@dimen/DIMEN_80DP"
             android:background="@drawable/chat_videomsg_send_pre"
             android:visibility="gone"
             />

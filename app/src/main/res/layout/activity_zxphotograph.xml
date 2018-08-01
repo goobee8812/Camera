@@ -16,7 +16,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="@dimen/DIMEN_72DP"
             android:background="#52000000"
             android:layout_gravity="bottom"
             >
@@ -40,7 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/video_normal_low"
-                    android:layout_marginLeft="80dp"
+                    android:layout_marginLeft="@dimen/DIMEN_80DP"
                     android:layout_gravity="center_vertical"
                     />
 
@@ -49,9 +49,9 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/ivPhotoAlbum"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                  android:layout_marginStart="20dp"
+                android:layout_width="@dimen/DIMEN_56DP"
+                android:layout_height="@dimen/DIMEN_56DP"
+                  android:layout_marginStart="@dimen/DIMEN_20DP"
                 android:scaleType="centerCrop"
                 android:layout_centerVertical="true"
                 />
@@ -64,31 +64,31 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:layout_marginEnd="50dp"
+            android:layout_marginEnd="@dimen/DIMEN_50DP"
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:visibility="visible">
 
             <ImageView
                 android:id="@+id/ivDelay"
-                android:layout_width="106dp"
-                android:layout_height="106dp"
-                android:layout_marginBottom="75dp"
+                android:layout_width="@dimen/DIMEN_106DP"
+                android:layout_height="@dimen/DIMEN_106DP"
+                android:layout_marginBottom="@dimen/DIMEN_75DP"
                 android:src="@mipmap/delay"
                 android:visibility="gone" />
 
             <ImageView
-                android:layout_width="106dp"
-                android:layout_height="106dp"
-                android:layout_marginBottom="75dp"
+                android:layout_width="@dimen/DIMEN_106DP"
+                android:layout_height="@dimen/DIMEN_106DP"
+                android:layout_marginBottom="@dimen/DIMEN_75DP"
                 android:src="@mipmap/scan_code"
                 android:visibility="gone" />
 
             <!--                       切换成录像                          -->
              <ImageView
                 android:id="@+id/ivRecording"
-                android:layout_width="106dp"
-                android:layout_height="106dp"
+                android:layout_width="@dimen/DIMEN_106DP"
+                android:layout_height="@dimen/DIMEN_106DP"
                 android:src="@mipmap/pickup"
                  android:visibility="gone"
                  />
@@ -98,19 +98,19 @@
             android:id="@+id/ivBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:layout_marginTop="22dp"
+            android:layout_marginStart="@dimen/DIMEN_22DP"
+            android:layout_marginTop="@dimen/DIMEN_22DP"
             android:background="?selectableItemBackground"
             android:clickable="true"
             android:src="@drawable/top_return_icon" />
 
         <LinearLayout
             android:id="@+id/llDelaySetting"
-            android:layout_width="174dp"
-            android:layout_height="206dp"
+            android:layout_width="@dimen/DIMEN_174DP"
+            android:layout_height="@dimen/DIMEN_206DP"
             android:layout_gravity="end"
-            android:layout_marginEnd="252dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginEnd="@dimen/DIMEN_252DP"
+            android:layout_marginTop="@dimen/DIMEN_40DP"
             android:background="@mipmap/mask_bg"
             android:orientation="vertical"
             android:visibility="gone">
@@ -122,22 +122,22 @@
 
                 <ImageView
                     android:id="@+id/ivDelayClose"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="@dimen/DIMEN_42DP"
+                    android:layout_height="@dimen/DIMEN_42DP"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="@dimen/DIMEN_32DP"
                     android:src="@mipmap/delay_close_red" />
 
                 <TextView
                     android:id="@+id/tvDelayClose"
-                    android:layout_width="174dp"
-                    android:layout_height="68dp"
+                    android:layout_width="@dimen/DIMEN_174DP"
+                    android:layout_height="@dimen/DIMEN_68DP"
                     android:layout_gravity="center_vertical"
                     android:gravity="center"
-                    android:paddingStart="30dp"
+                    android:paddingStart="@dimen/DIMEN_30DP"
                     android:text="@string/switch_off"
                     android:textColor="@color/photo_delay_text_color_red"
-                    android:textSize="26sp" />
+                    android:textSize="@dimen/DIMEN_26SP" />
             </FrameLayout>
 
             <View
@@ -153,22 +153,22 @@
 
                 <ImageView
                     android:id="@+id/ivDelay3s"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="@dimen/DIMEN_42DP"
+                    android:layout_height="@dimen/DIMEN_42DP"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="@dimen/DIMEN_32DP"
                     android:src="@mipmap/delay_3s" />
 
                 <TextView
                     android:id="@+id/tvDelay3s"
-                    android:layout_width="174dp"
-                    android:layout_height="68dp"
+                    android:layout_width="@dimen/DIMEN_174DP"
+                    android:layout_height="@dimen/DIMEN_68DP"
                     android:layout_gravity="center_vertical"
                     android:gravity="center"
-                    android:paddingStart="30dp"
+                    android:paddingStart="@dimen/DIMEN_30DP"
                     android:text="3 S"
                     android:textColor="#ffffff"
-                    android:textSize="26sp" />
+                    android:textSize="@dimen/DIMEN_26SP" />
 
             </FrameLayout>
 
@@ -185,22 +185,22 @@
 
                 <ImageView
                     android:id="@+id/ivDelay6s"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="@dimen/DIMEN_42DP"
+                    android:layout_height="@dimen/DIMEN_42DP"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="@dimen/DIMEN_32DP"
                     android:src="@mipmap/delay_6s" />
 
                 <TextView
                     android:id="@+id/tvDelay6s"
-                    android:layout_width="174dp"
-                    android:layout_height="68dp"
+                    android:layout_width="@dimen/DIMEN_174DP"
+                    android:layout_height="@dimen/DIMEN_68DP"
                     android:layout_gravity="center_vertical"
                     android:gravity="center"
-                    android:paddingStart="30dp"
+                    android:paddingStart="@dimen/DIMEN_30DP"
                     android:text="6 S"
                     android:textColor="#ffffff"
-                    android:textSize="26sp" />
+                    android:textSize="@dimen/DIMEN_26SP" />
             </FrameLayout>
         </LinearLayout>
 
