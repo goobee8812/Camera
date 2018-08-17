@@ -11,6 +11,7 @@ import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,6 +26,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -138,6 +140,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
 
     private void initView() {
         mSurfaceView = (SurfaceView) findViewById(R.id.camera_preview);
+        setSurfaceView();
         mHolder = mSurfaceView.getHolder();
         mHolder.addCallback(this);
 
@@ -396,6 +399,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
         }
     }
 
+
     // 获取相机实例
     public Camera getCameraInstance() {
         Camera c = null;
@@ -463,33 +467,31 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
 
 //                parameters.setPreviewSize(1024, 768);
 //                parameters.setPictureSize(1600, 1200);
-            }else {
+            } else if (MyApp.deviceId == 1 || MyApp.deviceId == 2) {
+                parameters.setPreviewSize(1024, 768);
+                parameters.setPictureSize(1024, 768);
+            } else {
                 List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-                            for (Camera.Size previewSize : previewSizes) {
-                                if (previewSize.width == PREVIEW_WIDTH && previewSize.height == PREVIEW_HEIGHT) {
-                                    parameters.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-                                    break;
-                                }
-                            }
-
-
+                for (Camera.Size previewSize : previewSizes) {
+                    if (previewSize.width == PREVIEW_WIDTH && previewSize.height == PREVIEW_HEIGHT) {
+                        parameters.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+                        break;
+                    }
+                }
 
 
                 List<Camera.Size> pictureSizes = parameters.getSupportedPictureSizes();
                 Camera.Size fs = null;
-                            for (int i = 0; i < pictureSizes.size(); i++) {
-                                Camera.Size psize = pictureSizes.get(i);
-                                if (psize.width == Picture_WIDTH) {
-                                    fs = psize;
-                                }
-                            }
+                for (int i = 0; i < pictureSizes.size(); i++) {
+                    Camera.Size psize = pictureSizes.get(i);
+                    if (psize.width == Picture_WIDTH) {
+                        fs = psize;
+                    }
+                }
                 parameters.setPictureSize(fs.width, fs.height);
 
 
-
             }
-
-
 
 
             mCamera.setParameters(parameters);
@@ -654,5 +656,19 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
 
             resetLock();
         }
+    }
+
+    //强制设置SurfaceView的宽高比，不然会有拉伸~
+    private void setSurfaceView() {
+        String model = Build.MODEL;
+        FrameLayout.LayoutParams SURFACE_VIEW = (FrameLayout.LayoutParams) mSurfaceView.getLayoutParams();
+        if (model.equals("R610")) {
+            SURFACE_VIEW.width = 1280;
+            SURFACE_VIEW.height = 960;
+        } else {
+            SURFACE_VIEW.width = 1024;
+            SURFACE_VIEW.height = 768;
+        }
+        mSurfaceView.setLayoutParams(SURFACE_VIEW);
     }
 }

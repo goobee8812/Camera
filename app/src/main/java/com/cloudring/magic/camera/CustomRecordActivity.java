@@ -231,7 +231,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
 
     private void setCameraParams() {
-        if (MyApp.deviceId == 1){
+        if (MyApp.deviceId == 1 || MyApp.deviceId == 2){
             width = 1024;
             height = 600;
         }
