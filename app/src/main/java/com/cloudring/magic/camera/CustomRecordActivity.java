@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -19,7 +20,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Chronometer;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.cloudring.magic.camera.utils.FileUtils;
@@ -55,8 +58,8 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private MediaRecorder       mediaRecorder;
     private String              currentVideoFilePath;
     private PhotographBroadCast photographBroadCast;
-    private int width  = 1280;
-    private int height = 720;
+    private int width  = 1024;
+    private int height = 768;
     private long mCurrentTime;
     private Handler handler         = new Handler();
     private int     releaseLockTime = 2 * 60 * 1000;
@@ -166,6 +169,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
     private void initView() {
         surfaceView = (SurfaceView) findViewById(R.id.record_surfaceView);
+        setSurfaceView();
         mRecordControl = (ImageView) findViewById(R.id.record_control);
         ivBack = (ImageView) findViewById(R.id.ivBack);
         ivCamera = (ImageView) findViewById(R.id.ivCamera);
@@ -233,7 +237,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private void setCameraParams() {
         if (MyApp.deviceId == 1 || MyApp.deviceId == 2){
             width = 1024;
-            height = 600;
+            height = 768;
         }
         if (mCamera != null) {
             Camera.Parameters params = mCamera.getParameters();
@@ -586,6 +590,20 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
             animationDrawable = (AnimationDrawable) mRecordControl.getBackground();
 
         }
+    }
+
+    //强制设置SurfaceView的宽高比，不然会有拉伸~
+    private void setSurfaceView() {
+        String model = Build.MODEL;
+        FrameLayout.LayoutParams SURFACE_VIEW = (FrameLayout.LayoutParams) surfaceView.getLayoutParams();
+        if (model.equals("R610")) {
+            SURFACE_VIEW.width = 1280;
+            SURFACE_VIEW.height = 960;
+        } else {
+            SURFACE_VIEW.width = 1024;
+            SURFACE_VIEW.height = 768;
+        }
+        surfaceView.setLayoutParams(SURFACE_VIEW);
     }
 
 
