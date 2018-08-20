@@ -12,8 +12,6 @@ import com.tencent.bugly.crashreport.CrashReport;
 public class MyApp extends Application {
 
     private static Context context;
-    public static final int deviceId = 2;   //0代表瀚阳  1代表狼图 2启迪
-
     @Override
     public void onCreate() {
         super.onCreate();

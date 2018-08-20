@@ -235,9 +235,10 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
 
     private void setCameraParams() {
-        if (MyApp.deviceId == 1 || MyApp.deviceId == 2){
-            width = 1024;
-            height = 768;
+        String model = Build.MODEL;
+      if(model.contains("R610")){//艾塔是1280*720（需要扩展）
+            width = 1280;
+            height = 960;
         }
         if (mCamera != null) {
             Camera.Parameters params = mCamera.getParameters();

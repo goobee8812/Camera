@@ -97,6 +97,10 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     private boolean isReleaseLock;
     private PhotographPresent photographPresent = new PhotographPresentImpl();
     private ScreenOffBroadCast screenOffBroadCast;
+
+    private int width  = 1024;
+    private int height = 768;
+
     Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -460,16 +464,19 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             parameters.setPictureFormat(ImageFormat.JPEG);
             parameters.setPreviewFormat(ImageFormat.NV21);
-
-            if (MyApp.deviceId == 0) {
-                parameters.setPreviewSize(1024, 768);
-                parameters.setPictureSize(1600, 1200);
-
-//                parameters.setPreviewSize(1024, 768);
-//                parameters.setPictureSize(1600, 1200);
-            } else if (MyApp.deviceId == 1 || MyApp.deviceId == 2) {
-                parameters.setPreviewSize(1024, 768);
-                parameters.setPictureSize(1024, 768);
+            String model = Build.MODEL;
+            if (model.contains("R610")) {
+                parameters.setPreviewSize(1280, 960);
+                parameters.setPictureSize(1280, 960);
+            } else if (model.contains("R631")
+                    || model.contains("R633")
+                    || model.contains("R636")
+                    || model.contains("R651")
+                    || model.contains("R652")
+                    || model.contains("R660")
+                    || model.contains("R661")) {
+                parameters.setPreviewSize(width, height);
+                parameters.setPictureSize(width, height);
             } else {
                 List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
                 for (Camera.Size previewSize : previewSizes) {
