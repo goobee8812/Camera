@@ -471,6 +471,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
             } else if (model.contains("R631")
                     || model.contains("R633")
                     || model.contains("R636")
+                    || model.contains("R668")
                     || model.contains("R651")
                     || model.contains("R652")
                     || model.contains("R660")

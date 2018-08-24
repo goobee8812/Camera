@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -76,7 +77,8 @@ public class ScanPhoto {
             //selection: 指定查询条件
             String selection = MediaStore.Images.Media.DATA + " like ?";
             //设定查询目录
-            String cameraPath = "/storage/emulated/0/Camera";
+//            String cameraPath = "/storage/emulated/0/Camera";
+            String cameraPath = Environment.getExternalStorageDirectory() + "/Camera";
             //定义selectionArgs：
             String[] selectionArgs = {cameraPath + "%"};
 
