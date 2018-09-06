@@ -65,7 +65,7 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
     private int     releaseLockTime = 2 * 60 * 1000;
     private boolean isReleaseLock;
 
-    private AnimationDrawable animationDrawable;
+//    private AnimationDrawable animationDrawable;
 
 
     private SurfaceHolder.Callback mCallBack = new SurfaceHolder.Callback() {
@@ -572,25 +572,27 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
 
     private void setXml2FrameAnim() {
 
-        animationDrawable = (AnimationDrawable) mRecordControl.getBackground();
+//        animationDrawable = (AnimationDrawable) mRecordControl.getBackground();
     }
 
 
     private void startAnimVideo() {
-        if (animationDrawable != null && !animationDrawable.isRunning()) {
-            animationDrawable.start();
-        }
+//        if (animationDrawable != null && !animationDrawable.isRunning()) {
+//            animationDrawable.start();
+//        }
+        mRecordControl.setImageResource(R.drawable.meizhi_camera_button_stop);
     }
 
     private void stopAnimVideo() {
-        if (animationDrawable != null && animationDrawable.isRunning()) {
-            animationDrawable.stop();
-            //mRecordControl.setBackgroundResource(R.drawable.frame_anim);   //重新设置一次，回复到原来初始状态
-            // mRecordControl.setBackground(new Drawable);
-            mRecordControl.setBackground(this.getResources().getDrawable(R.drawable.frame_anim));
-            animationDrawable = (AnimationDrawable) mRecordControl.getBackground();
-
-        }
+//        if (animationDrawable != null && animationDrawable.isRunning()) {
+//            animationDrawable.stop();
+//            //mRecordControl.setBackgroundResource(R.drawable.frame_anim);   //重新设置一次，回复到原来初始状态
+//            // mRecordControl.setBackground(new Drawable);
+//            mRecordControl.setBackground(this.getResources().getDrawable(R.drawable.frame_anim));
+//            animationDrawable = (AnimationDrawable) mRecordControl.getBackground();
+//
+//        }
+        mRecordControl.setImageResource(R.drawable.meizhi_video_button);
     }
 
     //强制设置SurfaceView的宽高比，不然会有拉伸~

@@ -42,6 +42,15 @@ android {
     }
     productFlavors {
     }
+
+    sourceSets.main {
+        jni.srcDirs = []
+        res.srcDirs = [
+                "src/main/res",
+                "src/main/res/drawable-mdpi",
+                "src/main/res/drawable-mdpi/meizhi",
+        ]
+    }
 }
 
 dependencies {
