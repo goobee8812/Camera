@@ -320,6 +320,7 @@ public class ZXPhotographActivity extends AppCompatActivity implements ScanPhoto
     private void startRecord() {
         Intent intent = new Intent(this, CustomRecordActivity.class);
         startActivityForResult(intent, 0);
+        finish();
     }
 
     private void initReceiver() {

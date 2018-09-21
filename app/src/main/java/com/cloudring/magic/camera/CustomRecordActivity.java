@@ -376,12 +376,19 @@ public class CustomRecordActivity extends AppCompatActivity implements View.OnCl
                     setToResult();
                 }
                 break;
-            case R.id.ivCamera:
-                finish();
+            case R.id.ivCamera: {
+                startCamera();
+            }
                 break;
             default:
                 break;
         }
+    }
+
+    private void startCamera() {
+        Intent intent = new Intent(this, ZXPhotographActivity.class);
+        startActivityForResult(intent, 0);
+        finish();
     }
 
     private boolean back() {
